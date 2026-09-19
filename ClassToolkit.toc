@@ -1,0 +1,17 @@
+## Interface: 11200
+## Title: Class Toolkit
+## Notes: Swing timer, buff and reagent reminders, spell ready icons, and hunter range and feed helpers. /ctk
+## Author: stealthzi
+## Version: 1.0.0
+## SavedVariables: ClassToolkitDB
+## SavedVariablesPerCharacter: ClassToolkitCharDB
+
+Core.lua
+Widgets.lua
+Spells.lua
+Swing.lua
+Ready.lua
+Buffs.lua
+Reagents.lua
+Hunter.lua
+Options.lua
