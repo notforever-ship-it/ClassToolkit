@@ -158,6 +158,98 @@ local function UpdateFeed(fromEvent)
 end
 
 ------------------------------------------------------------------------------------------------
+-- Low ammo box
+------------------------------------------------------------------------------------------------
+
+local ammoBox
+local ammoQueued = false
+
+-- The bag slots holding the ammo you have equipped, the shots in them, and its icon. nil when no ammo
+-- is equipped (a thrown weapon, or none at all).
+local function AmmoStacks()
+  local ok, slot = pcall(GetInventorySlotInfo, "AmmoSlot")
+  if not ok or not slot then return nil end
+  local link = GetInventoryItemLink("player", slot)
+  local _, _, name = string.find(link or "", "%[(.-)%]")
+  if not name then return nil end
+  local stacks, shots = 0, 0
+  for bag = 0, 4 do
+    for s = 1, (GetContainerNumSlots(bag) or 0) do
+      local itemLink = GetContainerItemLink(bag, s)
+      if itemLink and string.find(itemLink, "[" .. name .. "]", 1, true) then
+        local _, count = GetContainerItemInfo(bag, s)
+        stacks = stacks + 1
+        shots = shots + (count or 0)
+      end
+    end
+  end
+  return stacks, shots, GetInventoryItemTexture("player", slot)
+end
+
+local function UpdateAmmoBox()
+  ammoQueued = false
+  if not ammoBox or CTK.movingIcons then return end
+  local c = CTK.char
+  if not c.ammoBox or not CTK.IsClass("HUNTER") then
+    ammoBox:Hide()
+    return
+  end
+  local stacks, shots, texture = AmmoStacks()
+  if not stacks or stacks > (c.ammoBoxStacks or 2) then
+    ammoBox:Hide()
+    return
+  end
+  ammoBox.icon:SetTexture(texture or "Interface\\Icons\\INV_Ammo_Arrow_02")
+  if shots == 0 then
+    ammoBox.title:SetText("OUT OF AMMO")
+    ammoBox.detail:SetText("Buy more before you pull")
+  else
+    ammoBox.title:SetText("Low ammo")
+    ammoBox.detail:SetText(stacks .. (stacks == 1 and " stack, " or " stacks, ") .. shots .. " shots left")
+  end
+  ammoBox:Show()
+end
+
+-- Bags change many times a second while looting and shooting, so wait for them to settle.
+local function QueueAmmoBox()
+  if ammoQueued then return end
+  ammoQueued = true
+  CTK.After(0.5, UpdateAmmoBox)
+end
+
+local function CreateAmmoBox()
+  ammoBox = CreateFrame("Frame", "ClassToolkitAmmoBox", UIParent)
+  ammoBox:SetWidth(180)
+  ammoBox:SetHeight(44)
+  ammoBox:SetFrameStrata("MEDIUM")
+  CTK.MakeDraggable(ammoBox, "ammo", 0, 240)
+  ammoBox:EnableMouse(false)
+  ammoBox:SetBackdrop({
+    bgFile = "Interface\\Tooltips\\UI-Tooltip-Background",
+    edgeFile = "Interface\\Tooltips\\UI-Tooltip-Border",
+    tile = true, tileSize = 16, edgeSize = 16,
+    insets = { left = 4, right = 4, top = 4, bottom = 4 },
+  })
+  ammoBox:SetBackdropColor(0.35, 0, 0, 0.85)
+  ammoBox:SetBackdropBorderColor(1, 0.15, 0.15, 1)
+
+  ammoBox.icon = ammoBox:CreateTexture(nil, "ARTWORK")
+  ammoBox.icon:SetWidth(32)
+  ammoBox.icon:SetHeight(32)
+  ammoBox.icon:SetPoint("LEFT", ammoBox, "LEFT", 6, 0)
+  ammoBox.icon:SetTexCoord(0.07, 0.93, 0.07, 0.93)
+
+  ammoBox.title = ammoBox:CreateFontString(nil, "OVERLAY", "GameFontNormal")
+  ammoBox.title:SetPoint("TOPLEFT", ammoBox.icon, "TOPRIGHT", 8, -1)
+  ammoBox.title:SetTextColor(1, 0.3, 0.3)
+
+  ammoBox.detail = ammoBox:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
+  ammoBox.detail:SetPoint("BOTTOMLEFT", ammoBox.icon, "BOTTOMRIGHT", 8, 2)
+
+  ammoBox:Hide()
+end
+
+------------------------------------------------------------------------------------------------
 -- Setup
 ------------------------------------------------------------------------------------------------
 
@@ -184,9 +276,20 @@ local function Update()
     else
       feedFrame:Hide()
     end
+    ammoBox:EnableMouse(c.ammoBox and hunter and true or false)
+    if c.ammoBox and hunter then
+      ammoBox.icon:SetTexture("Interface\\Icons\\INV_Ammo_Arrow_02")
+      ammoBox.title:SetText("Low ammo box (drag)")
+      ammoBox.detail:SetText("2 stacks, 312 shots left")
+      ammoBox:Show()
+    else
+      ammoBox:Hide()
+    end
     return
   end
+  ammoBox:EnableMouse(false)
   UpdateFeed(false)
+  UpdateAmmoBox()
 end
 
 function CTK.InitHunter()
@@ -227,8 +330,11 @@ function CTK.InitHunter()
   end)
   feedFrame:SetScript("OnLeave", function() GameTooltip:Hide() end)
 
+  CreateAmmoBox()
+
   local f = CreateFrame("Frame")
-  local events = { "UNIT_HAPPINESS", "UNIT_PET", "UNIT_AURA", "PLAYER_ENTERING_WORLD" }
+  local events = { "UNIT_HAPPINESS", "UNIT_PET", "UNIT_AURA", "PLAYER_ENTERING_WORLD", "BAG_UPDATE",
+    "UNIT_INVENTORY_CHANGED" }
   for i = 1, table.getn(events) do
     pcall(f.RegisterEvent, f, events[i])
   end
@@ -244,6 +350,9 @@ function CTK.InitHunter()
       end
     elseif event == "PLAYER_ENTERING_WORLD" then
       CTK.After(2, function() UpdateFeed(false) end)
+      QueueAmmoBox()
+    elseif event == "BAG_UPDATE" or (event == "UNIT_INVENTORY_CHANGED" and arg1 == "player") then
+      QueueAmmoBox()
     end
   end)
 

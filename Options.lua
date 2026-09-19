@@ -4,7 +4,7 @@
 local CTK = ClassToolkit
 
 local GOLD, GREY, WHITE, END = "|cffffd100", "|cff9d9d9d", "|cffffffff", "|r"
-local WIDTH, HEIGHT = 340, 480
+local WIDTH, HEIGHT = 340, 510
 local ROW = 26
 
 local frame, classText, watchHeader, addBox, addButton, lockButton
@@ -33,6 +33,7 @@ local TIPS = {
   range = "Shows whether your target is in Auto Shot range, the dead zone, or melee range. Needs Auto Shot " ..
     "and Wing Clip on an action bar (any slot).",
   feed = "A happiness face when your pet stops being happy. Click it to feed.",
+  ammoBox = "A red box on screen when you're down to your last stacks of ammo (2 to start; /ctk ammo 3 to change).",
 }
 
 local function AddWatched()
@@ -126,15 +127,23 @@ local function Build()
   addButton:SetScript("OnClick", AddWatched)
 
   lockButton = CreateFrame("Button", "ClassToolkitLockButton", frame, "UIPanelButtonTemplate")
-  lockButton:SetWidth(130)
+  lockButton:SetWidth(110)
   lockButton:SetHeight(22)
   lockButton:SetPoint("BOTTOMLEFT", frame, "BOTTOMLEFT", 20, 40)
   lockButton:SetScript("OnClick", function() CTK.ToggleMoveIcons() end)
   Explain(lockButton, "Move the icons", "Unlock, drag the icons and bars where you want them, then lock again. " ..
     "Positions are shared by all your characters.")
 
+  local help = CreateFrame("Button", "ClassToolkitOptionsHelp", frame, "UIPanelButtonTemplate")
+  help:SetWidth(80)
+  help:SetHeight(22)
+  help:SetPoint("LEFT", lockButton, "RIGHT", 8, 0)
+  help:SetText("Help")
+  help:SetScript("OnClick", function() CTK.ToggleHelp() end)
+  Explain(help, "How to use", "What each part does, what the colours mean, and every command.")
+
   local done = CreateFrame("Button", "ClassToolkitDone", frame, "UIPanelButtonTemplate")
-  done:SetWidth(90)
+  done:SetWidth(80)
   done:SetHeight(22)
   done:SetPoint("BOTTOMRIGHT", frame, "BOTTOMRIGHT", -20, 40)
   done:SetText("Done")

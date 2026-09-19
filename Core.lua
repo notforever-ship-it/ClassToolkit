@@ -7,7 +7,7 @@
 ClassToolkit = {}
 local CTK = ClassToolkit
 
-CTK.VERSION = "1.0.0"
+CTK.VERSION = "1.1.0"
 CTK.movingIcons = false
 CTK.modules = {}   -- each module registers { update = function() } so settings changes reach it
 
@@ -95,6 +95,8 @@ local function ClassDefaults(class)
     reagents = true,
     range = hunter,
     feed = hunter,
+    ammoBox = hunter,
+    ammoBoxStacks = 2,
     feedWhen = "content",
     feedSound = true,
     debug = false,
@@ -144,6 +146,7 @@ CTK.TOGGLES = {
   { key = "reagents", command = "reagents", label = "Reagent and ammo warnings" },
   { key = "range", command = "range", label = "Range icon", class = "HUNTER" },
   { key = "feed", command = "feed", label = "Pet feed reminder", class = "HUNTER" },
+  { key = "ammoBox", command = "ammo", label = "Low ammo box", class = "HUNTER" },
 }
 
 function CTK.Toggle(key)
@@ -216,9 +219,10 @@ end
 -- Slash commands
 ------------------------------------------------------------------------------------------------
 
-local function Help()
+local function ChatHelp()
   CTK.Print("v" .. CTK.VERSION .. " commands:")
   CTK.Print("/ctk - open the options window")
+  CTK.Print("/ctk help - how to use Class Toolkit")
   CTK.Print("/ctk move - unlock or lock the icons and bars so you can drag them")
   for i = 1, table.getn(CTK.TOGGLES) do
     local t = CTK.TOGGLES[i]
@@ -227,6 +231,7 @@ local function Help()
   end
   CTK.Print("/ctk watch <spell> - add a spell ready icon, /ctk unwatch <spell> - remove it")
   CTK.Print("/ctk feed content | unhappy | sound - when the feed reminder shows, and its sound")
+  CTK.Print("/ctk ammo <stacks> - hunters: show the low ammo box at this many stacks left (2 to start)")
   CTK.Print("/ctk buffs reset - bring back buff reminders you right-clicked away")
   CTK.Print("/ctk counts - list your reagents and ammo")
   CTK.Print("/ctk version - show which version you have")
@@ -240,6 +245,20 @@ local function SlashHandler(msg)
 
   if cmd == "" or cmd == "options" then
     CTK.ToggleOptions()
+    return
+  elseif cmd == "help" then
+    CTK.ToggleHelp()
+    return
+  elseif cmd == "commands" then
+    ChatHelp()
+    return
+  elseif cmd == "ammo" and tonumber(rest) then
+    local stacks = math.max(1, math.floor(tonumber(rest)))
+    CTK.char.ammoBoxStacks = stacks
+    CTK.char.ammoBox = true
+    CTK.Print("the low ammo box shows when you're down to " .. stacks .. (stacks == 1 and " stack" or " stacks") ..
+      " of ammo.")
+    CTK.UpdateAll()
     return
   elseif cmd == "move" or cmd == "unlock" or cmd == "lock" then
     CTK.ToggleMoveIcons()
@@ -290,7 +309,7 @@ local function SlashHandler(msg)
       return
     end
   end
-  Help()
+  ChatHelp()
 end
 
 ------------------------------------------------------------------------------------------------
@@ -329,7 +348,7 @@ loader:SetScript("OnEvent", function()
     if not CTK.char.welcomed and CTK.char.class then
       CTK.char.welcomed = true
       CTK.Print("v" .. CTK.VERSION .. " loaded. Type /ctk to choose what shows for your " ..
-        string.lower(CTK.char.class) .. ".")
+        string.lower(CTK.char.class) .. ", or /ctk help for how it all works.")
     end
     CTK.After(1, CTK.UpdateAll)
   end

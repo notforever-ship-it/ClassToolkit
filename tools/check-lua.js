@@ -39,7 +39,7 @@ const KNOWN_GLOBALS = new Set((
   "GetInventorySlotInfo GetInventoryItemCount PetAbandon ChatFontNormal " +
   "GetPetTrainingPoints GetNumTrainerServices GetTrainerServiceInfo GetTrainerServiceLevelReq " +
   "GetContainerItemInfo GetContainerItemLink GetContainerNumSlots GetPlayerBuff GetPlayerBuffTimeLeft " +
-  "UnitIsDeadOrGhost UnitOnTaxi GetPetExperience IsTradeskillTrainer UnitRangedDamage GetSpellCooldown GetSpellTexture UnitMana " +
+  "GetInventoryItemLink GetInventoryItemTexture UnitIsDeadOrGhost UnitOnTaxi GetPetExperience IsTradeskillTrainer UnitRangedDamage GetSpellCooldown GetSpellTexture UnitMana " +
   "SUPERWOW_VERSION"
 ).split(/\s+/).filter(Boolean));
 

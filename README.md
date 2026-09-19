@@ -6,6 +6,7 @@ Small, useful helpers for every class on Ravencraft (and other 1.12.1 servers). 
 - **Buff reminder.** An icon appears when a buff your class keeps up is missing or about to run out: an aspect, an armor, a blessing or aura, Fortitude, Mark of the Wild and so on. Click it to cast, right-click to stop that reminder. Hunters also get a warning when Aspect of the Cheetah or the Pack is still on in a fight.
 - **Spell ready icons.** Pick up to 4 spells. Each gets an icon that greys out with a countdown on cooldown, turns blue without the mana (or rage, or energy), red when the target is out of range, and says **READY** when you can cast it. Hunters start with Arcane Shot.
 - **Reagent and ammo warnings.** A chat and mid-screen warning when you run low on a reagent you carry (Soul Shards, Ankhs, runes, candles, symbols, seeds, Flash Powder), and hunters' ammo at 200 and 50 shots.
+- **Low ammo box** for hunters: a red box on screen when you're down to your last 2 stacks of arrows or bullets, showing the stacks and shots left.
 - **Hunters:** a **range icon** (In range, Dead zone, Melee, Out of range) and a **pet feed reminder** that you click to feed.
 
 These started out in [PokeHuntLog](https://github.com/notforever-ship-it/PokeHuntLog), the hunter pet collection log, and moved here so every class can use them.
@@ -23,6 +24,7 @@ These started out in [PokeHuntLog](https://github.com/notforever-ship-it/PokeHun
 ## Use
 
 - Type **`/ctk`** to open the options: what shows on this character, the spells with a ready icon, and **Unlock icons** for moving things around.
+- Press **Help** in the options, or type **`/ctk help`**, for the How to use window.
 - Settings are **per character**, so your Paladin and your Hunter can show different things. Icon positions are shared by all your characters.
 - Anything a spell icon or the range icon needs to know about range has to come from an **action bar**: put the spell on any bar, even a page you never show.
 
@@ -32,7 +34,7 @@ These started out in [PokeHuntLog](https://github.com/notforever-ship-it/PokeHun
 |---|---|---|---|---|---|---|
 | Warrior, Rogue, Paladin, Shaman, Druid | yes | | yes | add your own | yes | |
 | Priest, Mage, Warlock | | wand | yes | add your own | yes | |
-| Hunter | yes | Auto Shot | yes | Arcane Shot | yes + ammo | yes |
+| Hunter | yes | Auto Shot | yes | Arcane Shot | yes + ammo, low ammo box | yes |
 
 ### Buff reminders by class
 
@@ -54,10 +56,13 @@ A reminder only appears once you know the spell. Buffs from other players count 
 | Command | What it does |
 |---|---|
 | `/ctk` | Open the options window |
+| `/ctk help` | Open the How to use window |
+| `/ctk commands` | List every command in chat |
 | `/ctk move` | Unlock or lock the icons and bars so you can drag them |
 | `/ctk swing`, `/ctk ranged` | Melee timer, Auto Shot / wand timer on or off |
 | `/ctk ready`, `/ctk buffs`, `/ctk reagents` | Spell ready icons, buff reminder, reagent warnings on or off |
-| `/ctk range`, `/ctk feed` | Hunters: range icon, feed reminder on or off |
+| `/ctk range`, `/ctk feed`, `/ctk ammo` | Hunters: range icon, feed reminder, low ammo box on or off |
+| `/ctk ammo <stacks>` | Hunters: show the low ammo box at this many stacks left (2 to start) |
 | `/ctk watch <spell>` / `/ctk unwatch <spell>` | Add or remove a spell ready icon |
 | `/ctk feed content` / `/ctk feed unhappy` / `/ctk feed sound` | When the feed reminder shows, and its sound |
 | `/ctk buffs reset` | Bring back buff reminders you right-clicked away |
@@ -92,6 +97,11 @@ Made by stealthzi.
 MIT, see [LICENSE](LICENSE).
 
 ## Changelog
+
+### 1.1.0
+
+- **How to use window:** a Help button in `/ctk`, or `/ctk help`. `/ctk commands` lists every command in chat.
+- **Low ammo box** for hunters: a red box on screen when you're down to your last 2 stacks of ammo, with the stacks and shots left. Its own switch in `/ctk`, draggable like the rest, and `/ctk ammo 3` changes when it shows.
 
 ### 1.0.0
 
