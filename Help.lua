@@ -25,7 +25,10 @@ local HELP_TEXT = table.concat({
   "- Hunters: a red " .. WHITE .. "in combat!" .. END .. " icon when Cheetah or Pack is still on in a fight.",
   " ",
   GOLD .. "Spell ready icons" .. END,
-  "- Add up to 4 spells in " .. WHITE .. "/ctk" .. END .. ". Shown in combat or while you target an enemy.",
+  "- Add as many spells as you like in " .. WHITE .. "/ctk" .. END .. ". Shown in combat or while you " ..
+    "target an enemy; they wrap onto another line past six.",
+  "- " .. WHITE .. "Ready icons: just the next one" .. END .. " keeps a single icon instead: whichever spell " ..
+    "you can cast now, or the one coming back soonest.",
   "- " .. GREY .. "Grey + number" .. END .. " cooling down   " .. BLUE .. "Blue" .. END .. " not enough mana/rage/energy   " ..
     RED .. "Red" .. END .. " out of range   " .. GREEN .. "READY" .. END .. " go",
   " ",

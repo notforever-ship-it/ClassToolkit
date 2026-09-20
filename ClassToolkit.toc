@@ -2,7 +2,7 @@
 ## Title: Class Toolkit
 ## Notes: Swing timer, buff and reagent reminders, spell ready icons, and hunter range and feed helpers. /ctk
 ## Author: stealthzi
-## Version: 1.1.0
+## Version: 1.2.0
 ## SavedVariables: ClassToolkitDB
 ## SavedVariablesPerCharacter: ClassToolkitCharDB
 

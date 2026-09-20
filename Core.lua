@@ -7,7 +7,7 @@
 ClassToolkit = {}
 local CTK = ClassToolkit
 
-CTK.VERSION = "1.1.0"
+CTK.VERSION = "1.2.0"
 CTK.movingIcons = false
 CTK.modules = {}   -- each module registers { update = function() } so settings changes reach it
 
@@ -89,6 +89,7 @@ local function ClassDefaults(class)
     swingMelee = not CASTERS[class],
     swingRanged = hunter or CASTERS[class] or false,  -- Auto Shot, or a wand's Shoot
     ready = true,
+    readyOne = false,   -- one icon showing the next spell ready, instead of one icon each
     watched = hunter and { "Arcane Shot" } or {},
     buffs = true,
     buffWarnSeconds = 60,
@@ -142,6 +143,7 @@ CTK.TOGGLES = {
   { key = "swingMelee", command = "swing", label = "Melee swing timer" },
   { key = "swingRanged", command = "ranged", label = "Auto Shot / wand timer" },
   { key = "ready", command = "ready", label = "Spell ready icons" },
+  { key = "readyOne", command = "one", label = "Ready icons: just the next one" },
   { key = "buffs", command = "buffs", label = "Buff reminder" },
   { key = "reagents", command = "reagents", label = "Reagent and ammo warnings" },
   { key = "range", command = "range", label = "Range icon", class = "HUNTER" },
@@ -174,8 +176,6 @@ end
 -- Watched spells (spell ready icons)
 ------------------------------------------------------------------------------------------------
 
-CTK.MAX_WATCHED = 4
-
 function CTK.Watch(name)
   if not name or name == "" then
     CTK.Print("type the spell's name, for example /ctk watch Arcane Shot")
@@ -187,10 +187,6 @@ function CTK.Watch(name)
       CTK.Print(watched[i] .. " is already watched.")
       return
     end
-  end
-  if table.getn(watched) >= CTK.MAX_WATCHED then
-    CTK.Print("you can watch up to " .. CTK.MAX_WATCHED .. " spells. Remove one with /ctk unwatch <spell>.")
-    return
   end
   local proper = CTK.SpellIndex and CTK.KnownSpellName(name)
   if not proper then
@@ -230,6 +226,7 @@ local function ChatHelp()
       (t.class and " (hunters)" or ""))
   end
   CTK.Print("/ctk watch <spell> - add a spell ready icon, /ctk unwatch <spell> - remove it")
+  CTK.Print("/ctk ready all | one - an icon for every watched spell, or one for the next one ready")
   CTK.Print("/ctk feed content | unhappy | sound - when the feed reminder shows, and its sound")
   CTK.Print("/ctk ammo <stacks> - hunters: show the low ammo box at this many stacks left (2 to start)")
   CTK.Print("/ctk buffs reset - bring back buff reminders you right-clicked away")
@@ -258,6 +255,16 @@ local function SlashHandler(msg)
     CTK.char.ammoBox = true
     CTK.Print("the low ammo box shows when you're down to " .. stacks .. (stacks == 1 and " stack" or " stacks") ..
       " of ammo.")
+    CTK.UpdateAll()
+    return
+  elseif cmd == "ready" and (rest == "one" or rest == "all") then
+    CTK.char.readyOne = (rest == "one")
+    CTK.char.ready = true
+    if CTK.char.readyOne then
+      CTK.Print("one ready icon, showing whichever watched spell is ready first.")
+    else
+      CTK.Print("a ready icon for every watched spell.")
+    end
     CTK.UpdateAll()
     return
   elseif cmd == "move" or cmd == "unlock" or cmd == "lock" then

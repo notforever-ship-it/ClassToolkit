@@ -61,24 +61,36 @@ function CTK.SetIconState(f, r, g, b, text)
   f.label:SetText(text or "")
 end
 
--- A draggable strip holding up to 'max' icons side by side. Only the icons in use are shown. 'gap' has
--- to leave room for the labels under the icons.
+-- A draggable strip of icons side by side, 'max' of them to a line. Only the icons in use are shown,
+-- and more are made if a module needs them, wrapping onto another line. 'gap' has to leave room for
+-- the labels under the icons.
 function CTK.CreateRow(name, positionKey, defaultX, defaultY, size, max, gap)
-  gap = gap or 10
   local row = CreateFrame("Frame", name, UIParent)
-  row:SetWidth(max * size + (max - 1) * gap)
+  row:SetWidth(max * size + (max - 1) * (gap or 10))
   row:SetHeight(size)
   row:SetFrameStrata("MEDIUM")
   CTK.MakeDraggable(row, positionKey, defaultX, defaultY)
   row:EnableMouse(false)   -- only while unlocked, so it never blocks clicks on the world
   row.icons = {}
-  for i = 1, max do
-    local icon = CTK.CreateIcon(name .. "Icon" .. i, row, size)
-    icon:SetPoint("LEFT", row, "LEFT", (i - 1) * (size + gap), 0)
-    icon:EnableMouse(false)
-    row.icons[i] = icon
-  end
+  row.iconName = name
+  row.iconSize = size
+  row.gap = gap or 10
+  row.perLine = max
+  for i = 1, max do CTK.RowIcon(row, i) end
   return row
+end
+
+-- The row's i-th icon, made the first time something asks for it.
+function CTK.RowIcon(row, i)
+  if row.icons[i] then return row.icons[i] end
+  local icon = CTK.CreateIcon(row.iconName .. "Icon" .. i, row, row.iconSize)
+  -- 1.12's Lua has no '%', so the line and the place on it are worked out by hand.
+  local line = math.floor((i - 1) / row.perLine)
+  local col = (i - 1) - line * row.perLine
+  icon:SetPoint("TOPLEFT", row, "TOPLEFT", col * (row.iconSize + row.gap), -line * (row.iconSize + 18))
+  icon:EnableMouse(false)
+  row.icons[i] = icon
+  return icon
 end
 
 -- Show the first 'used' icons of a row and hide the rest.

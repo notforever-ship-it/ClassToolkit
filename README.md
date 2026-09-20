@@ -4,7 +4,7 @@ Small, useful helpers for every class on Ravencraft (and other 1.12.1 servers). 
 
 - **Swing timer.** Bars counting down to your next melee swing, Auto Shot or wand shot. The red end of the Auto Shot bar is the aim: stand still then, or the shot is delayed. With SuperWoW there's an off-hand bar too.
 - **Buff reminder.** An icon appears when a buff your class keeps up is missing or about to run out: an aspect, an armor, a blessing or aura, Fortitude, Mark of the Wild and so on. Click it to cast, right-click to stop that reminder. Hunters also get a warning when Aspect of the Cheetah or the Pack is still on in a fight.
-- **Spell ready icons.** Pick up to 4 spells. Each gets an icon that greys out with a countdown on cooldown, turns blue without the mana (or rage, or energy), red when the target is out of range, and says **READY** when you can cast it. Hunters start with Arcane Shot.
+- **Spell ready icons.** Watch as many spells as you like. Each gets an icon that greys out with a countdown on cooldown, turns blue without the mana (or rage, or energy), red when the target is out of range, and says **READY** when you can cast it. Or keep **one** icon that shows whichever watched spell is ready first. Hunters start with Arcane Shot.
 - **Reagent and ammo warnings.** A chat and mid-screen warning when you run low on a reagent you carry (Soul Shards, Ankhs, runes, candles, symbols, seeds, Flash Powder), and hunters' ammo at 200 and 50 shots.
 - **Low ammo box** for hunters: a red box on screen when you're down to your last 2 stacks of arrows or bullets, showing the stacks and shots left.
 - **Hunters:** a **range icon** (In range, Dead zone, Melee, Out of range) and a **pet feed reminder** that you click to feed.
@@ -64,6 +64,7 @@ A reminder only appears once you know the spell. Buffs from other players count 
 | `/ctk range`, `/ctk feed`, `/ctk ammo` | Hunters: range icon, feed reminder, low ammo box on or off |
 | `/ctk ammo <stacks>` | Hunters: show the low ammo box at this many stacks left (2 to start) |
 | `/ctk watch <spell>` / `/ctk unwatch <spell>` | Add or remove a spell ready icon |
+| `/ctk ready all` / `/ctk ready one` | An icon for every watched spell, or one for the next one ready |
 | `/ctk feed content` / `/ctk feed unhappy` / `/ctk feed sound` | When the feed reminder shows, and its sound |
 | `/ctk buffs reset` | Bring back buff reminders you right-clicked away |
 | `/ctk counts` | List your reagents and ammo |
@@ -97,6 +98,12 @@ Made by stealthzi.
 MIT, see [LICENSE](LICENSE).
 
 ## Changelog
+
+### 1.2.0
+
+- **Watch as many spells as you like.** The four-spell limit is gone; the icons wrap onto another line past six, and the options window grows with the list.
+- **One icon instead of a row:** *Ready icons: just the next one* in `/ctk` (or `/ctk ready one`) shows whichever watched spell you can cast now, or the one coming back soonest.
+- While the icons are unlocked for dragging, every ready icon shows, so you can see how much room the row takes.
 
 ### 1.1.0
 

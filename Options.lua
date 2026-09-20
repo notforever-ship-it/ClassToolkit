@@ -5,9 +5,11 @@ local CTK = ClassToolkit
 
 local GOLD, GREY, WHITE, END = "|cffffd100", "|cff9d9d9d", "|cffffffff", "|r"
 local WIDTH, HEIGHT = 340, 510
+local MAX_LINES = 12   -- more than this and the window would run off the screen
 local ROW = 26
 
-local frame, classText, watchHeader, addBox, addButton, lockButton
+local frame, classText, watchHeader, extraText, addBox, addButton, lockButton
+local WatchLine
 local checks = {}
 local watchLines = {}
 
@@ -27,6 +29,8 @@ local TIPS = {
     "stand still then or the shot is delayed.",
   ready = "An icon for each watched spell: greyed out with a countdown on cooldown, blue without the mana, " ..
     "red out of range, READY when you can cast it. Shown in combat or while targeting an enemy.",
+  readyOne = "Keep one icon instead of a row: it shows whichever watched spell you can cast now, or the " ..
+    "one coming back soonest.",
   buffs = "An icon appears when a buff your class keeps up is missing or about to run out. Click it to " ..
     "cast, right-click to stop that reminder.",
   reagents = "A warning when you run low on a reagent you carry, and hunters' ammo at 200 and 50 shots.",
@@ -35,6 +39,23 @@ local TIPS = {
   feed = "A happiness face when your pet stops being happy. Click it to feed.",
   ammoBox = "A red box on screen when you're down to your last stacks of ammo (2 to start; /ctk ammo 3 to change).",
 }
+
+-- One line per watched spell, made as they're added, so you can watch as many as you like.
+WatchLine = function(i)
+  if watchLines[i] then return watchLines[i] end
+  local line = frame:CreateFontString(nil, "ARTWORK", "GameFontHighlightSmall")
+  local remove = CreateFrame("Button", "ClassToolkitUnwatch" .. i, frame, "UIPanelButtonTemplate")
+  remove:SetWidth(70)
+  remove:SetHeight(18)
+  remove:SetText("Remove")
+  remove.index = i
+  remove:SetScript("OnClick", function()
+    local name = CTK.char.watched[this.index]
+    if name then CTK.Unwatch(name) end
+  end)
+  watchLines[i] = { text = line, remove = remove }
+  return watchLines[i]
+end
 
 local function AddWatched()
   local text = addBox:GetText()
@@ -97,19 +118,9 @@ local function Build()
   watchHeader = frame:CreateFontString(nil, "ARTWORK", "GameFontNormal")
   watchHeader:SetText("Spell ready icons")
 
-  for i = 1, CTK.MAX_WATCHED do
-    local line = frame:CreateFontString(nil, "ARTWORK", "GameFontHighlightSmall")
-    local remove = CreateFrame("Button", "ClassToolkitUnwatch" .. i, frame, "UIPanelButtonTemplate")
-    remove:SetWidth(70)
-    remove:SetHeight(18)
-    remove:SetText("Remove")
-    remove.index = i
-    remove:SetScript("OnClick", function()
-      local name = CTK.char.watched[this.index]
-      if name then CTK.Unwatch(name) end
-    end)
-    watchLines[i] = { text = line, remove = remove }
-  end
+  extraText = frame:CreateFontString(nil, "ARTWORK", "GameFontHighlightSmall")
+  extraText:Hide()
+
 
   addBox = CreateFrame("EditBox", "ClassToolkitWatchBox", frame, "InputBoxTemplate")
   addBox:SetWidth(190)
@@ -118,7 +129,7 @@ local function Build()
   addBox:SetScript("OnEnterPressed", AddWatched)
   addBox:SetScript("OnEscapePressed", function() this:SetText("") this:ClearFocus() end)
   Explain(addBox, "Add a spell", "Type a spell's name exactly as your spellbook shows it, for example " ..
-    "Arcane Shot or Overpower, then press Enter or Add.")
+    "Arcane Shot or Overpower, then press Enter or Add. Add as many as you like.")
 
   addButton = CreateFrame("Button", "ClassToolkitWatchAdd", frame, "UIPanelButtonTemplate")
   addButton:SetWidth(70)
@@ -180,24 +191,44 @@ function CTK.RefreshOptions()
   watchHeader:SetPoint("TOPLEFT", frame, "TOPLEFT", 24, y)
   y = y - 22
   local watched = CTK.char.watched
-  for i = 1, CTK.MAX_WATCHED do
-    local line = watchLines[i]
+  local count = table.getn(watched)
+  local shown = count
+  if shown > MAX_LINES then shown = MAX_LINES end
+
+  if count == 0 then
+    local line = WatchLine(1)
+    line.text:ClearAllPoints()
+    line.text:SetPoint("TOPLEFT", frame, "TOPLEFT", 30, y - 3)
+    line.text:SetText(GREY .. "None yet. Add one below." .. END)
+    line.remove:Hide()
+    y = y - 22
+  end
+  for i = 1, shown do
+    local line = WatchLine(i)
     line.text:ClearAllPoints()
     line.text:SetPoint("TOPLEFT", frame, "TOPLEFT", 30, y - 3)
     line.remove:ClearAllPoints()
     line.remove:SetPoint("TOPRIGHT", frame, "TOPRIGHT", -24, y)
-    if watched[i] then
-      local known = CTK.KnowsSpell(watched[i])
-      line.text:SetText((known and WHITE or GREY) .. watched[i] .. END .. (known and "" or GREY .. "  (not learned)" .. END))
-      line.remove:Show()
-    elseif i == 1 then
-      line.text:SetText(GREY .. "None yet. Add one below." .. END)
-      line.remove:Hide()
-    else
-      line.text:SetText("")
-      line.remove:Hide()
-    end
+    local known = CTK.KnowsSpell(watched[i])
+    line.text:SetText((known and WHITE or GREY) .. watched[i] .. END .. (known and "" or GREY .. "  (not learned)" .. END))
+    line.remove:Show()
     y = y - 22
+  end
+  -- Lines left over from a longer list before.
+  for i = shown + 1, table.getn(watchLines) do
+    if count > 0 or i > 1 then
+      watchLines[i].text:SetText("")
+      watchLines[i].remove:Hide()
+    end
+  end
+  if count > shown then
+    extraText:ClearAllPoints()
+    extraText:SetPoint("TOPLEFT", frame, "TOPLEFT", 30, y - 3)
+    extraText:SetText(GREY .. "and " .. (count - shown) .. " more - /ctk unwatch <spell> removes one" .. END)
+    extraText:Show()
+    y = y - 22
+  else
+    extraText:Hide()
   end
 
   y = y - 6
@@ -205,7 +236,9 @@ function CTK.RefreshOptions()
   addBox:SetPoint("TOPLEFT", frame, "TOPLEFT", 32, y)
   addButton:ClearAllPoints()
   addButton:SetPoint("LEFT", addBox, "RIGHT", 10, 0)
-  if table.getn(watched) >= CTK.MAX_WATCHED then addButton:Disable() else addButton:Enable() end
+
+  -- The window grows with the list so the buttons along the bottom stay clear of it.
+  frame:SetHeight(-y + 18 + 88)
 
   lockButton:SetText(CTK.movingIcons and "Lock icons" or "Unlock icons")
 end
