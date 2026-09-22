@@ -11,7 +11,7 @@
 local CTK = ClassToolkit
 
 local SIZE, PER_LINE, GAP = 32, 6, 36
-local QUESTION = "Interface\Icons\INV_Misc_QuestionMark"
+local QUESTION = "Interface\\Icons\\INV_Misc_QuestionMark"
 local row
 
 -- Show one icon as that spell stands right now.

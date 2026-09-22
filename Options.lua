@@ -9,6 +9,7 @@ local MAX_LINES = 12   -- more than this and the window would run off the screen
 local ROW = 26
 
 local frame, classText, watchHeader, extraText, addBox, addButton, lockButton
+local rangeText, rangeBox, rangeButton
 local WatchLine
 local checks = {}
 local watchLines = {}
@@ -34,8 +35,9 @@ local TIPS = {
   buffs = "An icon appears when a buff your class keeps up is missing or about to run out. Click it to " ..
     "cast, right-click to stop that reminder.",
   reagents = "A warning when you run low on a reagent you carry, and hunters' ammo at 200 and 50 shots.",
-  range = "Shows whether your target is in Auto Shot range, the dead zone, or melee range. Needs Auto Shot " ..
-    "and Wing Clip on an action bar (any slot).",
+  range = "Whether your target is in range of one spell, your class's main attack to start: In range, Melee, " ..
+    "Under 10 yd, Under 28 yd or Out of range. Hunters also get the dead zone. The spell must be on an action " ..
+    "bar (any slot). Pick another spell below.",
   feed = "A happiness face when your pet stops being happy. Click it to feed.",
   ammoBox = "A red box on screen when you're down to your last stacks of ammo (2 to start; /ctk ammo 3 to change).",
 }
@@ -64,6 +66,13 @@ local function AddWatched()
     addBox:SetText("")
   end
   addBox:ClearFocus()
+end
+
+local function SetRangeSpell()
+  local text = rangeBox:GetText()
+  if CTK.SetRangeSpell then CTK.SetRangeSpell(text) end
+  rangeBox:SetText("")
+  rangeBox:ClearFocus()
 end
 
 local function Build()
@@ -114,6 +123,23 @@ local function Build()
     end)
     checks[i] = check
   end
+
+  -- Which spell the range icon watches, and a box to change it.
+  rangeText = frame:CreateFontString(nil, "ARTWORK", "GameFontHighlightSmall")
+  rangeBox = CreateFrame("EditBox", "ClassToolkitRangeBox", frame, "InputBoxTemplate")
+  rangeBox:SetWidth(190)
+  rangeBox:SetHeight(18)
+  rangeBox:SetAutoFocus(false)
+  rangeBox:SetScript("OnEnterPressed", SetRangeSpell)
+  rangeBox:SetScript("OnEscapePressed", function() this:SetText("") this:ClearFocus() end)
+  Explain(rangeBox, "Range icon spell", "Type a spell's name as your spellbook shows it and press Enter or Set. " ..
+    "The icon then says whether your target is in that spell's range. Leave it empty and press Set to go back " ..
+    "to your class's main attack.")
+  rangeButton = CreateFrame("Button", "ClassToolkitRangeSet", frame, "UIPanelButtonTemplate")
+  rangeButton:SetWidth(70)
+  rangeButton:SetHeight(20)
+  rangeButton:SetText("Set")
+  rangeButton:SetScript("OnClick", SetRangeSpell)
 
   watchHeader = frame:CreateFontString(nil, "ARTWORK", "GameFontNormal")
   watchHeader:SetText("Spell ready icons")
@@ -185,6 +211,21 @@ function CTK.RefreshOptions()
       check:Hide()
     end
   end
+
+  -- The range icon's spell sits right under the switches.
+  y = y - 4
+  local spell = CTK.RangeSpell and CTK.RangeSpell()
+  local yards = spell and CTK.SpellRange(spell)
+  local reach = (yards == 0 and " (melee)") or (yards and (" (" .. yards .. " yd)")) or ""
+  rangeText:ClearAllPoints()
+  rangeText:SetPoint("TOPLEFT", frame, "TOPLEFT", 30, y)
+  rangeText:SetText(GREY .. "Range icon watches: " .. END .. WHITE .. (spell or "nothing yet") .. END .. GREY .. reach .. END)
+  y = y - 18
+  rangeBox:ClearAllPoints()
+  rangeBox:SetPoint("TOPLEFT", frame, "TOPLEFT", 32, y)
+  rangeButton:ClearAllPoints()
+  rangeButton:SetPoint("LEFT", rangeBox, "RIGHT", 10, 0)
+  y = y - 22
 
   y = y - 12
   watchHeader:ClearAllPoints()

@@ -11,6 +11,7 @@ local POWER_WORDS = { Mana = true, Rage = true, Energy = true }
 
 local spells = {}          -- [lowercase name] = { name, index, texture }
 local costs = {}           -- [lowercase name] = number, read from the tooltip on first use
+local ranges = {}          -- [lowercase name] = yards (0 for melee), read from the tooltip on first use
 local actionSlots = {}     -- [lowercase name] = slot
 local slotsDirty = true
 local lastSlotScan = 0
@@ -18,6 +19,7 @@ local lastSlotScan = 0
 local function ScanSpellbook()
   spells = {}
   costs = {}
+  ranges = {}
   local i = 1
   while i < 500 do
     local name = GetSpellName(i, BOOK)
@@ -94,6 +96,39 @@ function CTK.SpellCost(name)
     tip:Hide()
   end
   return costs[key] or nil
+end
+
+-- How far the spell reaches: yards as the tooltip says ("30 yd range", talents included), 0 for
+-- "Melee Range", or nil when the tooltip doesn't say (a spell cast on yourself).
+function CTK.SpellRange(name)
+  local key = name and string.lower(name)
+  if not key or not spells[key] then return nil end
+  if ranges[key] == nil then
+    ranges[key] = false
+    local tip = CTK.ScanTooltip()
+    tip:SetSpell(spells[key].index, BOOK)
+    for line = 1, 4 do
+      local text = CTK.ScanLine("Right", line)
+      if text then
+        -- "35 yd range", or "8 - 35 yd range" for a shot with a minimum: the far end is what matters.
+        local _, _, low, high = string.find(text, "^(%d+)%s*%-%s*(%d+) yd")
+        local _, _, yards = string.find(text, "^(%d+) yd")
+        if high then
+          ranges[key] = tonumber(high)
+          break
+        elseif yards then
+          ranges[key] = tonumber(yards)
+          break
+        elseif string.find(string.lower(text), "melee", 1, true) then
+          ranges[key] = 0
+          break
+        end
+      end
+    end
+    tip:Hide()
+  end
+  if ranges[key] == false then return nil end
+  return ranges[key]
 end
 
 -- The action slot holding this spell, or nil. The bars are re-read a second after they change.

@@ -7,7 +7,7 @@
 ClassToolkit = {}
 local CTK = ClassToolkit
 
-CTK.VERSION = "1.2.0"
+CTK.VERSION = "1.3.0"
 CTK.movingIcons = false
 CTK.modules = {}   -- each module registers { update = function() } so settings changes reach it
 
@@ -94,7 +94,8 @@ local function ClassDefaults(class)
     buffs = true,
     buffWarnSeconds = 60,
     reagents = true,
-    range = hunter,
+    range = true,
+    rangeSpell = false,   -- false: the class's main attack (see Range.lua); a name: that spell
     feed = hunter,
     ammoBox = hunter,
     ammoBoxStacks = 2,
@@ -112,6 +113,11 @@ function CTK.ApplyDefaults()
   local defaults = ClassDefaults(class)
   for k, v in pairs(defaults) do
     if CTK.char[k] == nil then CTK.char[k] = v end
+  end
+  -- Up to 1.2 the range icon was for hunters only, so other classes have it saved as off. Once.
+  if not CTK.char.rangeForAll then
+    CTK.char.rangeForAll = true
+    CTK.char.range = true
   end
   CTK.char.class = class
   return true
@@ -146,7 +152,7 @@ CTK.TOGGLES = {
   { key = "readyOne", command = "one", label = "Ready icons: just the next one" },
   { key = "buffs", command = "buffs", label = "Buff reminder" },
   { key = "reagents", command = "reagents", label = "Reagent and ammo warnings" },
-  { key = "range", command = "range", label = "Range icon", class = "HUNTER" },
+  { key = "range", command = "range", label = "Range icon" },
   { key = "feed", command = "feed", label = "Pet feed reminder", class = "HUNTER" },
   { key = "ammoBox", command = "ammo", label = "Low ammo box", class = "HUNTER" },
 }
@@ -225,6 +231,7 @@ local function ChatHelp()
     CTK.Print("/ctk " .. t.command .. " - " .. string.lower(t.label) .. " on or off" ..
       (t.class and " (hunters)" or ""))
   end
+  CTK.Print("/ctk range <spell> - the spell the range icon watches (default: your class's main attack)")
   CTK.Print("/ctk watch <spell> - add a spell ready icon, /ctk unwatch <spell> - remove it")
   CTK.Print("/ctk ready all | one - an icon for every watched spell, or one for the next one ready")
   CTK.Print("/ctk feed content | unhappy | sound - when the feed reminder shows, and its sound")
@@ -269,6 +276,9 @@ local function SlashHandler(msg)
     return
   elseif cmd == "move" or cmd == "unlock" or cmd == "lock" then
     CTK.ToggleMoveIcons()
+    return
+  elseif cmd == "range" and rest ~= "" and rest ~= "on" and rest ~= "off" then
+    if CTK.SetRangeSpell then CTK.SetRangeSpell(rest) end
     return
   elseif cmd == "watch" then
     CTK.Watch(rest)
@@ -342,7 +352,7 @@ loader:SetScript("OnEvent", function()
 
     -- Modules build their frames now; they stay hidden until the character is in the world.
     if CTK.InitWidgets then CTK.InitWidgets() end
-    local inits = { "InitSpells", "InitSwing", "InitReady", "InitBuffs", "InitReagents", "InitHunter" }
+    local inits = { "InitSpells", "InitSwing", "InitReady", "InitBuffs", "InitReagents", "InitRange", "InitHunter" }
     for i = 1, table.getn(inits) do
       local init = CTK[inits[i]]
       if init then

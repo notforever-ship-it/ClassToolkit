@@ -37,9 +37,15 @@ local HELP_TEXT = table.concat({
   "- Hunters: warnings at 200 and 50 shots, and a " .. RED .. "Low ammo" .. END .. " box on screen when you're down " ..
     "to your last 2 stacks (" .. WHITE .. "/ctk ammo 3" .. END .. " to change).",
   " ",
+  GOLD .. "Range icon" .. END,
+  "- Watches one spell, your class's main attack to start (Fireball, Shadow Bolt, Heroic Strike, Auto Shot...). " ..
+    WHITE .. "/ctk range <spell>" .. END .. " or the box in /ctk picks another.",
+  "- " .. GREEN .. "In range" .. END .. " (with the yards)  " .. GREEN .. "Melee" .. END .. "  |cffff9933Under 10 yd|r  " ..
+    YELLOW .. "Under 28 yd" .. END .. "  " .. GREY .. "Out of range" .. END .. ". Hunters: " .. RED .. "Dead zone" .. END ..
+    " when neither shot nor Wing Clip lands.",
+  "- The spell has to be on an action bar (any slot) for its range to be read.",
+  " ",
   GOLD .. "Hunters" .. END,
-  "- Range icon: " .. GREEN .. "In range" .. END .. "  " .. RED .. "Dead zone" .. END .. "  |cffff9933Melee|r  " ..
-    GREY .. "Out of range" .. END .. ". Needs Auto Shot and Wing Clip on a bar.",
   "- Feed reminder: a happiness face when your pet isn't happy. Click it, then click a food in your bags.",
   " ",
   GOLD .. "Commands" .. END,
@@ -52,7 +58,7 @@ local frame
 local function Build()
   frame = CreateFrame("Frame", "ClassToolkitHelp", UIParent)
   frame:SetWidth(500)
-  frame:SetHeight(650)
+  frame:SetHeight(700)
   frame:SetPoint("CENTER", UIParent, "CENTER", 0, 20)
   frame:SetFrameStrata("DIALOG")
   frame:SetClampedToScreen(true)
@@ -84,7 +90,7 @@ local function Build()
   local text = frame:CreateFontString(nil, "ARTWORK", "GameFontHighlightSmall")
   text:SetPoint("TOPLEFT", frame, "TOPLEFT", 26, -64)
   text:SetWidth(448)
-  text:SetHeight(530)
+  text:SetHeight(580)
   text:SetJustifyH("LEFT")
   text:SetJustifyV("TOP")
   text:SetText(HELP_TEXT)
