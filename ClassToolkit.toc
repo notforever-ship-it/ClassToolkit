@@ -2,13 +2,14 @@
 ## Title: Class Toolkit
 ## Notes: Swing timer, range icon, buff and reagent reminders, spell ready icons for every class, and hunter feed helpers. /ctk
 ## Author: stealthzi
-## Version: 1.3.0
+## Version: 1.4.0
 ## SavedVariables: ClassToolkitDB
 ## SavedVariablesPerCharacter: ClassToolkitCharDB
 
 Core.lua
 Widgets.lua
 Spells.lua
+Dots.lua
 Swing.lua
 Ready.lua
 Buffs.lua

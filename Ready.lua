@@ -23,6 +23,27 @@ local function Paint(icon, name, power)
   local inRange = nil
   if CTK.HasAttackableTarget() then inRange = CTK.SpellInRange(name) end
 
+  -- A DoT still ticking on the target you have: count it down, purple, and say when it is ending.
+  local isDot = CTK.DotDuration and CTK.DotDuration(name)
+  if isDot then
+    local dotLeft, onTarget = CTK.DotOnTarget(name)
+    if dotLeft then
+      icon.icon:SetVertexColor(0.85, 0.65, 1)
+      icon.count:SetText(tostring(math.ceil(dotLeft)))
+      if dotLeft <= 3 then
+        CTK.SetIconState(icon, 1, 0.6, 0.1, "ending")
+      else
+        CTK.SetIconState(icon, 0.7, 0.4, 1, "on target")
+      end
+      return
+    elseif onTarget then
+      icon.icon:SetVertexColor(0.85, 0.65, 1)
+      icon.count:SetText("")
+      CTK.SetIconState(icon, 0.7, 0.4, 1, "on target")
+      return
+    end
+  end
+
   if left > 0 then
     icon.icon:SetVertexColor(0.4, 0.4, 0.4)
     -- The global cooldown shows too, but a countdown for it would only flicker.
@@ -39,18 +60,22 @@ local function Paint(icon, name, power)
   else
     icon.icon:SetVertexColor(1, 1, 1)
     icon.count:SetText("")
-    CTK.SetIconState(icon, 0.3, 1, 0.3, "READY")
+    CTK.SetIconState(icon, 0.3, 1, 0.3, isDot and "APPLY" or "READY")
   end
 end
 
 -- With one icon only: the spell you can cast now (the first in your list wins), or else whichever is
--- coming back soonest.
+-- coming back soonest. A DoT still ticking on the target counts as "coming back" when it ends.
 local function NextReady(watched)
   local best, bestLeft = nil, nil
   for i = 1, table.getn(watched) do
     local name = watched[i]
     if CTK.KnowsSpell(name) then
       local left = CTK.SpellCooldown(name)
+      if CTK.DotDuration and CTK.DotDuration(name) then
+        local dotLeft = CTK.DotOnTarget(name)
+        if dotLeft and dotLeft > left then left = dotLeft end
+      end
       if not best or left < bestLeft then
         best = name
         bestLeft = left

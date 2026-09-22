@@ -29,7 +29,8 @@ local TIPS = {
   swingRanged = "Counts down to your next Auto Shot or wand shot. On Auto Shot the red end is the aim: " ..
     "stand still then or the shot is delayed.",
   ready = "An icon for each watched spell: greyed out with a countdown on cooldown, blue without the mana, " ..
-    "red out of range, READY when you can cast it. Shown in combat or while targeting an enemy.",
+    "red out of range, READY when you can cast it. A DoT counts down in purple while it ticks on your target, " ..
+    "then says APPLY. Shown in combat or while targeting an enemy.",
   readyOne = "Keep one icon instead of a row: it shows whichever watched spell you can cast now, or the " ..
     "one coming back soonest.",
   buffs = "An icon appears when a buff your class keeps up is missing or about to run out. Click it to " ..

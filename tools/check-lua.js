@@ -40,7 +40,7 @@ const KNOWN_GLOBALS = new Set((
   "GetPetTrainingPoints GetNumTrainerServices GetTrainerServiceInfo GetTrainerServiceLevelReq " +
   "GetContainerItemInfo GetContainerItemLink GetContainerNumSlots GetPlayerBuff GetPlayerBuffTimeLeft " +
   "GetInventoryItemLink GetInventoryItemTexture UnitIsDeadOrGhost UnitOnTaxi GetPetExperience IsTradeskillTrainer UnitRangedDamage GetSpellCooldown GetSpellTexture UnitMana " +
-  "SUPERWOW_VERSION"
+  "UnitDebuff BOOKTYPE_SPELL SUPERWOW_VERSION"
 ).split(/\s+/).filter(Boolean));
 
 // Member calls that don't exist in Lua 5.0 / the 1.12 client.

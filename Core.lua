@@ -7,7 +7,7 @@
 ClassToolkit = {}
 local CTK = ClassToolkit
 
-CTK.VERSION = "1.3.0"
+CTK.VERSION = "1.4.0"
 CTK.movingIcons = false
 CTK.modules = {}   -- each module registers { update = function() } so settings changes reach it
 
@@ -91,6 +91,7 @@ local function ClassDefaults(class)
     ready = true,
     readyOne = false,   -- one icon showing the next spell ready, instead of one icon each
     watched = hunter and { "Arcane Shot" } or {},
+    dotTimes = {},      -- [spell] = seconds you set with /ctk dot; 0 switches a DoT timer off
     buffs = true,
     buffWarnSeconds = 60,
     reagents = true,
@@ -233,6 +234,7 @@ local function ChatHelp()
   end
   CTK.Print("/ctk range <spell> - the spell the range icon watches (default: your class's main attack)")
   CTK.Print("/ctk watch <spell> - add a spell ready icon, /ctk unwatch <spell> - remove it")
+  CTK.Print("/ctk dot - which watched spells count as DoTs; /ctk dot <spell> <seconds> | off | auto to correct one")
   CTK.Print("/ctk ready all | one - an icon for every watched spell, or one for the next one ready")
   CTK.Print("/ctk feed content | unhappy | sound - when the feed reminder shows, and its sound")
   CTK.Print("/ctk ammo <stacks> - hunters: show the low ammo box at this many stacks left (2 to start)")
@@ -279,6 +281,9 @@ local function SlashHandler(msg)
     return
   elseif cmd == "range" and rest ~= "" and rest ~= "on" and rest ~= "off" then
     if CTK.SetRangeSpell then CTK.SetRangeSpell(rest) end
+    return
+  elseif cmd == "dot" or cmd == "dots" then
+    if CTK.SetDot then CTK.SetDot(rest) end
     return
   elseif cmd == "watch" then
     CTK.Watch(rest)
@@ -352,7 +357,7 @@ loader:SetScript("OnEvent", function()
 
     -- Modules build their frames now; they stay hidden until the character is in the world.
     if CTK.InitWidgets then CTK.InitWidgets() end
-    local inits = { "InitSpells", "InitSwing", "InitReady", "InitBuffs", "InitReagents", "InitRange", "InitHunter" }
+    local inits = { "InitSpells", "InitDots", "InitSwing", "InitReady", "InitBuffs", "InitReagents", "InitRange", "InitHunter" }
     for i = 1, table.getn(inits) do
       local init = CTK[inits[i]]
       if init then

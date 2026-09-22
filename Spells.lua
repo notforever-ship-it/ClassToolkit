@@ -12,7 +12,9 @@ local POWER_WORDS = { Mana = true, Rage = true, Energy = true }
 local spells = {}          -- [lowercase name] = { name, index, texture }
 local costs = {}           -- [lowercase name] = number, read from the tooltip on first use
 local ranges = {}          -- [lowercase name] = yards (0 for melee), read from the tooltip on first use
+local dotTimes = {}        -- [lowercase name] = seconds a DoT ticks (false: not a DoT), from the tooltip
 local actionSlots = {}     -- [lowercase name] = slot
+local slotNames = {}       -- [slot] = what the button's tooltip calls it
 local slotsDirty = true
 local lastSlotScan = 0
 
@@ -20,6 +22,7 @@ local function ScanSpellbook()
   spells = {}
   costs = {}
   ranges = {}
+  dotTimes = {}
   local i = 1
   while i < 500 do
     local name = GetSpellName(i, BOOK)
@@ -35,18 +38,51 @@ local function ScanActionSlots()
   slotsDirty = false
   lastSlotScan = GetTime()
   actionSlots = {}
+  slotNames = {}
   local tip = CTK.ScanTooltip()
   for slot = 1, 120 do
     if HasAction(slot) then
       tip:SetOwner(WorldFrame, "ANCHOR_NONE")
       tip:SetAction(slot)
       local text = CTK.ScanLine("Left", 1)
-      if text and not actionSlots[string.lower(text)] then
-        actionSlots[string.lower(text)] = slot
+      if text then
+        slotNames[slot] = text
+        if not actionSlots[string.lower(text)] then actionSlots[string.lower(text)] = slot end
       end
       tip:Hide()
     end
   end
+end
+
+-- What sits in an action slot, as its tooltip names it (a spell's name, or a macro's).
+function CTK.ActionName(slot)
+  if slotsDirty and GetTime() - lastSlotScan > 1 then ScanActionSlots() end
+  return slot and slotNames[slot]
+end
+
+-- Seconds a damage-over-time spell keeps ticking, read from its tooltip ("...40 Shadow damage over
+-- 12 sec"), or nil when the tooltip says nothing of the kind: then it is not a DoT.
+function CTK.SpellDotDuration(name)
+  local key = name and string.lower(name)
+  if not key or not spells[key] then return nil end
+  if dotTimes[key] == nil then
+    dotTimes[key] = false
+    local tip = CTK.ScanTooltip()
+    tip:SetSpell(spells[key].index, BOOK)
+    for line = 2, 8 do
+      local text = CTK.ScanLine("Left", line)
+      if text then
+        local _, _, secs = string.find(text, "over (%d+) sec")
+        if secs then
+          dotTimes[key] = tonumber(secs)
+          break
+        end
+      end
+    end
+    tip:Hide()
+  end
+  if dotTimes[key] == false then return nil end
+  return dotTimes[key]
 end
 
 -- The spell as the spellbook spells it, or nil if the player doesn't know it.

@@ -31,6 +31,12 @@ local HELP_TEXT = table.concat({
     "you can cast now, or the one coming back soonest.",
   "- " .. GREY .. "Grey + number" .. END .. " cooling down   " .. BLUE .. "Blue" .. END .. " not enough mana/rage/energy   " ..
     RED .. "Red" .. END .. " out of range   " .. GREEN .. "READY" .. END .. " go",
+  "- " .. WHITE .. "DoTs" .. END .. ": a watched spell that does damage over time (Corruption, Serpent Sting, Rend, " ..
+    "Moonfire, Immolate...) counts down in |cffb366ffpurple|r while it ticks on the target you have, turns " ..
+    "|cffff9933ending|r for the last 3 seconds, then says " .. GREEN .. "APPLY" .. END .. ". Only your current target " ..
+    "counts; switch targets and the icon follows.",
+  "- The addon reads the DoT's length from the spell's tooltip. " .. WHITE .. "/ctk dot" .. END .. " lists what it found; " ..
+    WHITE .. "/ctk dot Rend 12" .. END .. " corrects one, " .. WHITE .. "off" .. END .. " or " .. WHITE .. "auto" .. END .. " instead of a number.",
   " ",
   GOLD .. "Reagents and ammo" .. END,
   "- A chat warning when a reagent you carry runs low. " .. WHITE .. "/ctk counts" .. END .. " lists what you have.",
@@ -58,7 +64,7 @@ local frame
 local function Build()
   frame = CreateFrame("Frame", "ClassToolkitHelp", UIParent)
   frame:SetWidth(500)
-  frame:SetHeight(700)
+  frame:SetHeight(740)
   frame:SetPoint("CENTER", UIParent, "CENTER", 0, 20)
   frame:SetFrameStrata("DIALOG")
   frame:SetClampedToScreen(true)
@@ -90,7 +96,7 @@ local function Build()
   local text = frame:CreateFontString(nil, "ARTWORK", "GameFontHighlightSmall")
   text:SetPoint("TOPLEFT", frame, "TOPLEFT", 26, -64)
   text:SetWidth(448)
-  text:SetHeight(580)
+  text:SetHeight(620)
   text:SetJustifyH("LEFT")
   text:SetJustifyV("TOP")
   text:SetText(HELP_TEXT)
