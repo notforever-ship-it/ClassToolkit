@@ -99,6 +99,18 @@ MIT, see [LICENSE](LICENSE).
 
 ## Changelog
 
+### 1.4.1
+
+- The range icon showed a question mark for some spells (the hunter's Auto Shot among them) because the client gave no icon for them when the spellbook was read. The icon is now taken from the action button holding the spell instead, so the ready icons and DoT timers get it too.
+
+### 1.4.0
+
+- DoT timers on the spell ready icons.
+
+### 1.3.0
+
+- Range icon for every class: it watches your class's main attack, or any spell you pick with `/ctk range <spell>`.
+
 ### 1.2.0
 
 - **Watch as many spells as you like.** The four-spell limit is gone; the icons wrap onto another line past six, and the options window grows with the list.

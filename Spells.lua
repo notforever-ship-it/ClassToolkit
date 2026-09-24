@@ -23,15 +23,17 @@ local function ScanSpellbook()
   costs = {}
   ranges = {}
   dotTimes = {}
-  local i = 1
+  local i, noIcon = 1, 0
   while i < 500 do
     local name = GetSpellName(i, BOOK)
     if not name then break end
+    local texture = GetSpellTexture(i, BOOK)
+    if not texture then noIcon = noIcon + 1 end
     -- Ranks are listed lowest first, so the last one seen is the highest.
-    spells[string.lower(name)] = { name = name, index = i, texture = GetSpellTexture(i, BOOK) }
+    spells[string.lower(name)] = { name = name, index = i, texture = texture }
     i = i + 1
   end
-  CTK.Debug("spellbook: " .. (i - 1) .. " entries")
+  CTK.Debug("spellbook: " .. (i - 1) .. " entries" .. ((noIcon > 0) and (", " .. noIcon .. " without an icon") or ""))
 end
 
 local function ScanActionSlots()
@@ -100,9 +102,16 @@ function CTK.SpellIndex(name)
   return s and s.index
 end
 
+-- The spell's icon. The client sometimes hands back no icon when the book is read (the hunter's Auto
+-- Shot, for one), so the book is asked again, and failing that the action button holding the spell.
 function CTK.SpellTexture(name)
   local s = name and spells[string.lower(name)]
-  return s and s.texture
+  if not s then return nil end
+  if not s.texture then s.texture = GetSpellTexture(s.index, BOOK) end
+  if s.texture then return s.texture end
+  local slot = CTK.ActionSlotFor(name)
+  if slot then return GetActionTexture(slot) end
+  return nil
 end
 
 -- Seconds left on the spell's cooldown (0 when ready), and the cooldown's full length.
