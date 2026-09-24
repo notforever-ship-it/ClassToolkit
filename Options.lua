@@ -39,6 +39,9 @@ local TIPS = {
   range = "Whether your target is in range of one spell, your class's main attack to start: In range, Melee, " ..
     "Under 10 yd, Under 28 yd or Out of range. Hunters also get the dead zone. The spell must be on an action " ..
     "bar (any slot). Pick another spell below.",
+  aggro = "A bar showing how close you are to pulling the mob off your pet, who the mob is really attacking, " ..
+    "and what to do: Shoot, Ease off, Hold, or Feign Death. Threat is estimated from the combat log and " ..
+    "corrected by what the mob attacks, so it learns your server's numbers as you fight.",
   feed = "A happiness face when your pet stops being happy. Click it to feed.",
   ammoBox = "A red box on screen when you're down to your last stacks of ammo (2 to start; /ctk ammo 3 to change).",
 }

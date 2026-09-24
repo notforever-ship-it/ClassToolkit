@@ -30,11 +30,11 @@ These started out in [PokeHuntLog](https://github.com/notforever-ship-it/PokeHun
 
 ### What starts switched on
 
-| | Melee timer | Auto Shot / wand timer | Buff reminder | Spell ready | Reagents | Range and feed |
+| | Melee timer | Auto Shot / wand timer | Buff reminder | Spell ready | Reagents | Range icon | Aggro meter and feed |
 |---|---|---|---|---|---|---|
-| Warrior, Rogue, Paladin, Shaman, Druid | yes | | yes | add your own | yes | |
-| Priest, Mage, Warlock | | wand | yes | add your own | yes | |
-| Hunter | yes | Auto Shot | yes | Arcane Shot | yes + ammo, low ammo box | yes |
+| Warrior, Rogue, Paladin, Shaman, Druid | yes | | yes | add your own | yes | yes | |
+| Priest, Mage, Warlock | | wand | yes | add your own | yes | yes | |
+| Hunter | yes | Auto Shot | yes | Arcane Shot | yes + ammo, low ammo box | yes | yes |
 
 ### Buff reminders by class
 
@@ -98,6 +98,10 @@ Made by stealthzi.
 MIT, see [LICENSE](LICENSE).
 
 ## Changelog
+
+### 1.5.0
+
+- **Aggro meter for hunters.** A bar showing how close you are to pulling the mob off your pet, who the mob is really attacking, and what to do: Shoot, Ease off, Hold, or Feign Death. Threat is counted from the combat log (damage, Growl, Distracting Shot, Feign Death) and corrected by what the mob attacks, so it learns your server's Growl numbers as you fight. Switch in `/ctk` or `/ctk aggro`; `/ctk aggro growl <threat>` if you know what Growl is worth on your server.
 
 ### 1.4.1
 

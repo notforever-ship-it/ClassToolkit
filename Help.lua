@@ -52,6 +52,14 @@ local HELP_TEXT = table.concat({
   "- The spell has to be on an action bar (any slot) for its range to be read.",
   " ",
   GOLD .. "Hunters" .. END,
+  "- Aggro meter: how close you are to pulling the mob off your pet, who it's really attacking, and what to do: " ..
+    GREEN .. "Shoot" .. END .. ", " .. YELLOW .. "Ease off" .. END .. " (a crit could pull it), |cffff9933Hold|r (your next shot " ..
+    "pulls it), " .. RED .. "ON YOU - Feign Death!" .. END .. " Early in a fight it says Hold a lot: one good shot beats a " ..
+    "single Growl, so let the pet bite a few times first.",
+  "- Threat is counted from the combat log (damage, Growl, Distracting Shot, Feign Death); a mob turns on you past 130% " ..
+    "of your pet's threat, 110% up close. When the mob's real target disagrees, the count gives way and learns what " ..
+    "Growl is worth on your server. " .. WHITE .. "/ctk aggro growl 170" .. END .. " sets it, " .. WHITE .. "/ctk aggro reset" ..
+    END .. " forgets.",
   "- Feed reminder: a happiness face when your pet isn't happy. Click it, then click a food in your bags.",
   " ",
   GOLD .. "Commands" .. END,

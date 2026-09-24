@@ -7,7 +7,7 @@
 ClassToolkit = {}
 local CTK = ClassToolkit
 
-CTK.VERSION = "1.4.1"
+CTK.VERSION = "1.5.0"
 CTK.movingIcons = false
 CTK.modules = {}   -- each module registers { update = function() } so settings changes reach it
 
@@ -98,6 +98,9 @@ local function ClassDefaults(class)
     range = true,
     rangeSpell = false,   -- false: the class's main attack (see Range.lua); a name: that spell
     feed = hunter,
+    aggro = hunter,       -- the aggro meter: your threat against your pet's on the mob you target
+    aggroGrowl = false,   -- false: Growl's threat by its rank; a number: what you set with /ctk aggro growl
+    aggroScale = 1,       -- how much more (or less) the pet's threat is worth than counted, learned from fights
     ammoBox = hunter,
     ammoBoxStacks = 2,
     feedWhen = "content",
@@ -154,6 +157,7 @@ CTK.TOGGLES = {
   { key = "buffs", command = "buffs", label = "Buff reminder" },
   { key = "reagents", command = "reagents", label = "Reagent and ammo warnings" },
   { key = "range", command = "range", label = "Range icon" },
+  { key = "aggro", command = "aggro", label = "Aggro meter", class = "HUNTER" },
   { key = "feed", command = "feed", label = "Pet feed reminder", class = "HUNTER" },
   { key = "ammoBox", command = "ammo", label = "Low ammo box", class = "HUNTER" },
 }
@@ -236,6 +240,7 @@ local function ChatHelp()
   CTK.Print("/ctk watch <spell> - add a spell ready icon, /ctk unwatch <spell> - remove it")
   CTK.Print("/ctk dot - which watched spells count as DoTs; /ctk dot <spell> <seconds> | off | auto to correct one")
   CTK.Print("/ctk ready all | one - an icon for every watched spell, or one for the next one ready")
+  CTK.Print("/ctk aggro growl <threat> | auto - what one Growl is worth; /ctk aggro reset - forget what it learned")
   CTK.Print("/ctk feed content | unhappy | sound - when the feed reminder shows, and its sound")
   CTK.Print("/ctk ammo <stacks> - hunters: show the low ammo box at this many stacks left (2 to start)")
   CTK.Print("/ctk buffs reset - bring back buff reminders you right-clicked away")
@@ -281,6 +286,9 @@ local function SlashHandler(msg)
     return
   elseif cmd == "range" and rest ~= "" and rest ~= "on" and rest ~= "off" then
     if CTK.SetRangeSpell then CTK.SetRangeSpell(rest) end
+    return
+  elseif cmd == "aggro" and rest ~= "" and rest ~= "on" and rest ~= "off" then
+    if CTK.SetAggro then CTK.SetAggro(rest) end
     return
   elseif cmd == "dot" or cmd == "dots" then
     if CTK.SetDot then CTK.SetDot(rest) end
@@ -357,7 +365,7 @@ loader:SetScript("OnEvent", function()
 
     -- Modules build their frames now; they stay hidden until the character is in the world.
     if CTK.InitWidgets then CTK.InitWidgets() end
-    local inits = { "InitSpells", "InitDots", "InitSwing", "InitReady", "InitBuffs", "InitReagents", "InitRange", "InitHunter" }
+    local inits = { "InitSpells", "InitDots", "InitSwing", "InitReady", "InitBuffs", "InitReagents", "InitRange", "InitAggro", "InitHunter" }
     for i = 1, table.getn(inits) do
       local init = CTK[inits[i]]
       if init then
