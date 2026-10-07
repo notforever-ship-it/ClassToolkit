@@ -36,7 +36,7 @@ const KNOWN_GLOBALS = new Set((
   "CastSpellByName WorldFrame " +
   "seterrorhandler geterrorhandler _ERRORMESSAGE debugstack GetNumAddOns GetAddOnInfo GetAddOnMetadata GetBuildInfo " +
   "UnitHealthMax UnitManaMax UnitAttackPower UnitDamage UnitAttackSpeed UnitArmor UnitStat GetSpellName " +
-  "GetInventorySlotInfo GetInventoryItemCount PetAbandon ChatFontNormal " +
+  "GetInventorySlotInfo GetInventoryItemCount GetItemInfo PetAbandon ChatFontNormal " +
   "GetPetTrainingPoints GetNumTrainerServices GetTrainerServiceInfo GetTrainerServiceLevelReq " +
   "GetContainerItemInfo GetContainerItemLink GetContainerNumSlots GetPlayerBuff GetPlayerBuffTimeLeft " +
   "GetInventoryItemLink GetInventoryItemTexture UnitIsDeadOrGhost UnitOnTaxi GetPetExperience IsTradeskillTrainer UnitRangedDamage GetSpellCooldown GetSpellTexture UnitMana " +

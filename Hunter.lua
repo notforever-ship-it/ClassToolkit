@@ -96,15 +96,35 @@ end
 local ammoBox
 local ammoQueued = false
 
--- The bag slots holding the ammo you have equipped, the shots in them, and its icon. nil when no ammo
--- is equipped (a thrown weapon, or none at all).
+-- The box also shows whenever you are down to this many shots in all, whatever the stacks look like: it is
+-- the same level as the first chat warning (Reagents.lua).
+local LOW_SHOTS = 200
+local NEEDS_AMMO = { ["Bows"] = true, ["Guns"] = true, ["Crossbows"] = true }
+
+-- Is a bow, gun or crossbow in the ranged slot? (Thrown weapons and wands need no ammo.)
+local function HasAmmoWeapon()
+  local ok, slot = pcall(GetInventorySlotInfo, "RangedSlot")
+  if not ok or not slot then return false end
+  local link = GetInventoryItemLink("player", slot)
+  local _, _, id = string.find(link or "", "item:(%d+)")
+  if not id then return false end
+  local okInfo, _, _, _, _, _, subType = pcall(GetItemInfo, "item:" .. id .. ":0:0:0")
+  return okInfo and subType and NEEDS_AMMO[subType] or false
+end
+
+-- How many spare stacks of your equipped ammo are in your bags, all your shots (the equipped stack plus the
+-- bags), and its icon. With no ammo equipped but a bow, gun or crossbow in your hand that is 0 stacks and 0
+-- shots; nil when no ammo is wanted (a thrown weapon, a wand, or nothing).
 local function AmmoStacks()
   local ok, slot = pcall(GetInventorySlotInfo, "AmmoSlot")
   if not ok or not slot then return nil end
   local link = GetInventoryItemLink("player", slot)
   local _, _, name = string.find(link or "", "%[(.-)%]")
-  if not name then return nil end
-  local stacks, shots = 0, 0
+  if not name then
+    if HasAmmoWeapon() then return 0, 0, nil end
+    return nil
+  end
+  local stacks, shots = 0, GetInventoryItemCount("player", slot) or 0
   for bag = 0, 4 do
     for s = 1, (GetContainerNumSlots(bag) or 0) do
       local itemLink = GetContainerItemLink(bag, s)
@@ -127,7 +147,7 @@ local function UpdateAmmoBox()
     return
   end
   local stacks, shots, texture = AmmoStacks()
-  if not stacks or stacks > (c.ammoBoxStacks or 2) then
+  if not stacks or (stacks > (c.ammoBoxStacks or 2) and shots > LOW_SHOTS) then
     ammoBox:Hide()
     return
   end
@@ -137,7 +157,8 @@ local function UpdateAmmoBox()
     ammoBox.detail:SetText("Buy more before you pull")
   else
     ammoBox.title:SetText("Low ammo")
-    ammoBox.detail:SetText(stacks .. (stacks == 1 and " stack, " or " stacks, ") .. shots .. " shots left")
+    local spare = stacks == 0 and "" or (", " .. stacks .. (stacks == 1 and " spare stack" or " spare stacks"))
+    ammoBox.detail:SetText(shots .. " shots left" .. spare)
   end
   ammoBox:Show()
 end
