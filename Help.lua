@@ -40,8 +40,8 @@ local HELP_TEXT = table.concat({
   " ",
   GOLD .. "Reagents and ammo" .. END,
   "- A chat warning when a reagent you carry runs low. " .. WHITE .. "/ctk counts" .. END .. " lists what you have.",
-  "- Hunters: warnings at 200 and 50 shots, and a " .. RED .. "Low ammo" .. END .. " box on screen when you're down " ..
-    "to your last 2 stacks (" .. WHITE .. "/ctk ammo 3" .. END .. " to change).",
+  "- Hunters: warnings at 200 and 50 shots, and a " .. RED .. "Low ammo" .. END .. " box on screen when the ammo you " ..
+    "have equipped is down to 100 shots (" .. WHITE .. "/ctk ammo 50" .. END .. " to change). It only looks at the equipped stack, not your bags.",
   " ",
   GOLD .. "Range icon" .. END,
   "- Watches one spell, your class's main attack to start (Fireball, Shadow Bolt, Heroic Strike, Auto Shot...). " ..

@@ -7,7 +7,7 @@
 ClassToolkit = {}
 local CTK = ClassToolkit
 
-CTK.VERSION = "1.5.1"
+CTK.VERSION = "1.5.2"
 CTK.movingIcons = false
 CTK.modules = {}   -- each module registers { update = function() } so settings changes reach it
 
@@ -102,7 +102,7 @@ local function ClassDefaults(class)
     aggroGrowl = false,   -- false: Growl's threat by its rank; a number: what you set with /ctk aggro growl
     aggroScale = 1,       -- how much more (or less) the pet's threat is worth than counted, learned from fights
     ammoBox = hunter,
-    ammoBoxStacks = 2,
+    ammoBoxShots = 100,
     feedWhen = "content",
     feedSound = true,
     debug = false,
@@ -242,7 +242,7 @@ local function ChatHelp()
   CTK.Print("/ctk ready all | one - an icon for every watched spell, or one for the next one ready")
   CTK.Print("/ctk aggro growl <threat> | auto - what one Growl is worth; /ctk aggro reset - forget what it learned")
   CTK.Print("/ctk feed content | unhappy | sound - when the feed reminder shows, and its sound")
-  CTK.Print("/ctk ammo <stacks> - hunters: show the low ammo box at this many stacks left (2 to start)")
+  CTK.Print("/ctk ammo <shots> - hunters: show the low ammo box when your equipped ammo is down to this many shots (100 to start)")
   CTK.Print("/ctk buffs reset - bring back buff reminders you right-clicked away")
   CTK.Print("/ctk counts - list your reagents and ammo")
   CTK.Print("/ctk version - show which version you have")
@@ -264,11 +264,10 @@ local function SlashHandler(msg)
     ChatHelp()
     return
   elseif cmd == "ammo" and tonumber(rest) then
-    local stacks = math.max(1, math.floor(tonumber(rest)))
-    CTK.char.ammoBoxStacks = stacks
+    local shots = math.max(1, math.floor(tonumber(rest)))
+    CTK.char.ammoBoxShots = shots
     CTK.char.ammoBox = true
-    CTK.Print("the low ammo box shows when you're down to " .. stacks .. (stacks == 1 and " stack" or " stacks") ..
-      " of ammo.")
+    CTK.Print("the low ammo box shows when the ammo you have equipped is down to " .. shots .. " shots.")
     CTK.UpdateAll()
     return
   elseif cmd == "ready" and (rest == "one" or rest == "all") then

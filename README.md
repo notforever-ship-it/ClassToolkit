@@ -6,7 +6,7 @@ Small, useful helpers for every class on Ravencraft (and other 1.12.1 servers). 
 - **Buff reminder.** An icon appears when a buff your class keeps up is missing or about to run out: an aspect, an armor, a blessing or aura, Fortitude, Mark of the Wild and so on. Click it to cast, right-click to stop that reminder. Hunters also get a warning when Aspect of the Cheetah or the Pack is still on in a fight.
 - **Spell ready icons.** Watch as many spells as you like. Each gets an icon that greys out with a countdown on cooldown, turns blue without the mana (or rage, or energy), red when the target is out of range, and says **READY** when you can cast it. Or keep **one** icon that shows whichever watched spell is ready first. Hunters start with Arcane Shot.
 - **Reagent and ammo warnings.** A chat and mid-screen warning when you run low on a reagent you carry (Soul Shards, Ankhs, runes, candles, symbols, seeds, Flash Powder), and hunters' ammo at 200 and 50 shots.
-- **Low ammo box** for hunters: a red box on screen when you're down to your last 2 spare stacks of arrows or bullets, or to 200 shots or fewer in all (the equipped stack counts), or when a bow, gun or crossbow is in your hand with no ammo equipped.
+- **Low ammo box** for hunters: a red box on screen when you're down to your last 2 spare stacks of arrows or bullets, when the ammo you have equipped is down to 100 shots (`/ctk ammo <shots>` to change), or when a bow, gun or crossbow is in your hand with no ammo equipped. It looks only at the equipped stack, not your bags.
 - **Hunters:** a **range icon** (In range, Dead zone, Melee, Out of range) and a **pet feed reminder** that you click to feed.
 
 These started out in [PokeHuntLog](https://github.com/notforever-ship-it/PokeHuntLog), the hunter pet collection log, and moved here so every class can use them.
@@ -62,7 +62,7 @@ A reminder only appears once you know the spell. Buffs from other players count 
 | `/ctk swing`, `/ctk ranged` | Melee timer, Auto Shot / wand timer on or off |
 | `/ctk ready`, `/ctk buffs`, `/ctk reagents` | Spell ready icons, buff reminder, reagent warnings on or off |
 | `/ctk range`, `/ctk feed`, `/ctk ammo` | Hunters: range icon, feed reminder, low ammo box on or off |
-| `/ctk ammo <stacks>` | Hunters: show the low ammo box at this many stacks left (2 to start) |
+| `/ctk ammo <shots>` | Hunters: show the low ammo box when your equipped ammo is down to this many shots (100 to start) |
 | `/ctk watch <spell>` / `/ctk unwatch <spell>` | Add or remove a spell ready icon |
 | `/ctk ready all` / `/ctk ready one` | An icon for every watched spell, or one for the next one ready |
 | `/ctk feed content` / `/ctk feed unhappy` / `/ctk feed sound` | When the feed reminder shows, and its sound |
@@ -98,6 +98,11 @@ Made by stealthzi.
 MIT, see [LICENSE](LICENSE).
 
 ## Changelog
+
+### 1.5.2
+
+- **The low ammo box only looks at the ammo you have equipped**, not your bags: it shows when that stack is down to 100 shots (`/ctk ammo <shots>` to change; it used to count spare stacks), and shows "OUT OF AMMO" when a bow, gun or crossbow is in your hand with no ammo equipped.
+- **The range icon is a plain bow for hunters**, so it looks the same every time. Before, it borrowed the watched spell's picture, which came and went depending on where the spell sat on your action bars. Other classes still get the watched spell's picture.
 
 ### 1.5.1
 

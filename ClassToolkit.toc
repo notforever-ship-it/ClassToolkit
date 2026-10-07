@@ -2,7 +2,7 @@
 ## Title: Class Toolkit
 ## Notes: Swing timer, range icon, buff and reagent reminders, spell ready icons for every class; aggro meter and feed helpers for hunters. /ctk
 ## Author: stealthzi
-## Version: 1.5.1
+## Version: 1.5.2
 ## SavedVariables: ClassToolkitDB
 ## SavedVariablesPerCharacter: ClassToolkitCharDB
 

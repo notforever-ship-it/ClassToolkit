@@ -96,9 +96,6 @@ end
 local ammoBox
 local ammoQueued = false
 
--- The box also shows whenever you are down to this many shots in all, whatever the stacks look like: it is
--- the same level as the first chat warning (Reagents.lua).
-local LOW_SHOTS = 200
 local NEEDS_AMMO = { ["Bows"] = true, ["Guns"] = true, ["Crossbows"] = true }
 
 -- Is a bow, gun or crossbow in the ranged slot? (Thrown weapons and wands need no ammo.)
@@ -112,30 +109,19 @@ local function HasAmmoWeapon()
   return okInfo and subType and NEEDS_AMMO[subType] or false
 end
 
--- How many spare stacks of your equipped ammo are in your bags, all your shots (the equipped stack plus the
--- bags), and its icon. With no ammo equipped but a bow, gun or crossbow in your hand that is 0 stacks and 0
--- shots; nil when no ammo is wanted (a thrown weapon, a wand, or nothing).
-local function AmmoStacks()
+-- The shots left in the ammo you have equipped (the stack in the ammo slot, not what is in your bags), and its
+-- icon. With no ammo equipped but a bow, gun or crossbow in your hand that is 0; nil when no ammo is wanted
+-- (a thrown weapon, a wand, or nothing).
+local function EquippedAmmo()
   local ok, slot = pcall(GetInventorySlotInfo, "AmmoSlot")
   if not ok or not slot then return nil end
   local link = GetInventoryItemLink("player", slot)
   local _, _, name = string.find(link or "", "%[(.-)%]")
   if not name then
-    if HasAmmoWeapon() then return 0, 0, nil end
+    if HasAmmoWeapon() then return 0, nil end
     return nil
   end
-  local stacks, shots = 0, GetInventoryItemCount("player", slot) or 0
-  for bag = 0, 4 do
-    for s = 1, (GetContainerNumSlots(bag) or 0) do
-      local itemLink = GetContainerItemLink(bag, s)
-      if itemLink and string.find(itemLink, "[" .. name .. "]", 1, true) then
-        local _, count = GetContainerItemInfo(bag, s)
-        stacks = stacks + 1
-        shots = shots + (count or 0)
-      end
-    end
-  end
-  return stacks, shots, GetInventoryItemTexture("player", slot)
+  return GetInventoryItemCount("player", slot) or 0, GetInventoryItemTexture("player", slot)
 end
 
 local function UpdateAmmoBox()
@@ -146,24 +132,23 @@ local function UpdateAmmoBox()
     ammoBox:Hide()
     return
   end
-  local stacks, shots, texture = AmmoStacks()
-  if not stacks or (stacks > (c.ammoBoxStacks or 2) and shots > LOW_SHOTS) then
+  local shots, texture = EquippedAmmo()
+  if not shots or shots > (c.ammoBoxShots or 100) then
     ammoBox:Hide()
     return
   end
   ammoBox.icon:SetTexture(texture or "Interface\\Icons\\INV_Ammo_Arrow_02")
   if shots == 0 then
     ammoBox.title:SetText("OUT OF AMMO")
-    ammoBox.detail:SetText("Buy more before you pull")
+    ammoBox.detail:SetText("Equip more before you pull")
   else
     ammoBox.title:SetText("Low ammo")
-    local spare = stacks == 0 and "" or (", " .. stacks .. (stacks == 1 and " spare stack" or " spare stacks"))
-    ammoBox.detail:SetText(shots .. " shots left" .. spare)
+    ammoBox.detail:SetText(shots .. " shots left")
   end
   ammoBox:Show()
 end
 
--- Bags change many times a second while looting and shooting, so wait for them to settle.
+-- Bags and the ammo slot change many times a second while looting and shooting, so wait for them to settle.
 local function QueueAmmoBox()
   if ammoQueued then return end
   ammoQueued = true
@@ -224,7 +209,7 @@ local function Update()
     if c.ammoBox and hunter then
       ammoBox.icon:SetTexture("Interface\\Icons\\INV_Ammo_Arrow_02")
       ammoBox.title:SetText("Low ammo box (drag)")
-      ammoBox.detail:SetText("2 stacks, 312 shots left")
+      ammoBox.detail:SetText("73 shots left")
       ammoBox:Show()
     else
       ammoBox:Hide()

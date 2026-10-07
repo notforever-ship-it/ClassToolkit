@@ -10,6 +10,14 @@
 local CTK = ClassToolkit
 
 local QUESTION = "Interface\\Icons\\INV_Misc_QuestionMark"
+local BOW = "Interface\\Icons\\INV_Weapon_Bow_05"
+
+-- The picture on the icon. Hunters always get a plain bow, so it shows the same every time; the spell's own
+-- picture came and went with where the spell sat on the action bars. Other classes get the watched spell's.
+local function RangeTexture(spell)
+  if CTK.IsClass("HUNTER") then return BOW end
+  return (spell and CTK.SpellTexture(spell)) or QUESTION
+end
 
 -- The spell each class starts with, and others to fall back on if it isn't known yet.
 local DEFAULTS = {
@@ -156,7 +164,7 @@ local function OnUpdate()
   local text = state.text
   if key == "range" and yards and yards > 0 then text = text .. " (" .. yards .. " yd)" end
   CTK.SetIconState(frame, state.r, state.g, state.b, text)
-  frame.icon:SetTexture((spell and CTK.SpellTexture(spell)) or QUESTION)
+  frame.icon:SetTexture(RangeTexture(spell))
   if key == "range" or key == "meleeGood" then
     frame.icon:SetVertexColor(1, 1, 1)
   else
@@ -172,7 +180,7 @@ local function Update()
   if CTK.movingIcons then
     if c.range then
       local spell = CTK.RangeSpell()
-      frame.icon:SetTexture((spell and CTK.SpellTexture(spell)) or QUESTION)
+      frame.icon:SetTexture(RangeTexture(spell))
       frame.icon:SetVertexColor(1, 1, 1)
       CTK.SetIconState(frame, 0.25, 1, 0.25, "Range icon (drag)")
       frame:Show()
