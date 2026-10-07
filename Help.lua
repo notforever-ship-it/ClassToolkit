@@ -118,7 +118,7 @@ local function Build()
 
   local credit = frame:CreateFontString(nil, "ARTWORK", "GameFontHighlightSmall")
   credit:SetPoint("BOTTOMLEFT", frame, "BOTTOMLEFT", 26, 26)
-  credit:SetText(GREY .. "Made by " .. END .. "|cffabd473stealthzi" .. END)
+  credit:SetText(GREY .. "Made by " .. END .. "|cffabd473stealthzi" .. END .. GREY .. "   v" .. CTK.VERSION .. END)
 end
 
 function CTK.ToggleHelp()

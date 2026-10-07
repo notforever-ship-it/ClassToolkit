@@ -99,6 +99,12 @@ MIT, see [LICENSE](LICENSE).
 
 ## Changelog
 
+### 1.5.3
+
+- **The low ammo box no longer cries wolf.** Some clients do not give the ammo slot an item name, which made the box say OUT OF AMMO with a full quiver. It now reads the equipped count directly, and only says OUT OF AMMO when a bow, gun or crossbow is in your hand, the ammo slot is empty, and there is no ammo in your bags either. If the count cannot be read it says nothing.
+- `/ctk ammodebug` prints what the game says about your ammo slot, to find out why the box does or does not show.
+- The Help window shows the version, like the other windows.
+
 ### 1.5.2
 
 - **The low ammo box only looks at the ammo you have equipped**, not your bags: it shows when that stack is down to 100 shots (`/ctk ammo <shots>` to change; it used to count spare stacks), and shows "OUT OF AMMO" when a bow, gun or crossbow is in your hand with no ammo equipped.

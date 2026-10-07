@@ -109,19 +109,51 @@ local function HasAmmoWeapon()
   return okInfo and subType and NEEDS_AMMO[subType] or false
 end
 
+-- Is there any ammo (arrows or bullets) anywhere in your bags?
+local function BagsHaveAmmo()
+  for bag = 0, 4 do
+    for s = 1, (GetContainerNumSlots(bag) or 0) do
+      local link = GetContainerItemLink(bag, s)
+      local _, _, id = string.find(link or "", "item:(%d+)")
+      if id then
+        local ok, _, _, _, _, kind = pcall(GetItemInfo, "item:" .. id .. ":0:0:0")
+        if ok and kind == "Projectile" then return true end
+      end
+    end
+  end
+  return false
+end
+
 -- The shots left in the ammo you have equipped (the stack in the ammo slot, not what is in your bags), and its
--- icon. With no ammo equipped but a bow, gun or crossbow in your hand that is 0; nil when no ammo is wanted
--- (a thrown weapon, a wand, or nothing).
+-- icon. The slot does not always give its item's name on every client, so the count is read straight from it.
+-- nil means "nothing to say": no ammo is wanted (thrown weapon, wand, nothing), or the count cannot be read.
+-- 0 (OUT OF AMMO) only when a bow, gun or crossbow is in your hand, the ammo slot is empty, and no ammo is in
+-- your bags either, so a client that hides the slot never gets a false alarm.
 local function EquippedAmmo()
   local ok, slot = pcall(GetInventorySlotInfo, "AmmoSlot")
   if not ok or not slot then return nil end
-  local link = GetInventoryItemLink("player", slot)
-  local _, _, name = string.find(link or "", "%[(.-)%]")
-  if not name then
-    if HasAmmoWeapon() then return 0, nil end
-    return nil
+  local count = GetInventoryItemCount("player", slot) or 0
+  local texture = GetInventoryItemTexture("player", slot)
+  if count > 0 then return count, texture end
+  if texture or GetInventoryItemLink("player", slot) then return nil end   -- ammo is there but its count is unreadable
+  if HasAmmoWeapon() and not BagsHaveAmmo() then return 0, nil end
+  return nil
+end
+
+-- /ctk ammodebug: what the game says about the ammo slot, for finding out why the box does or doesn't show.
+function CTK.AmmoDebug()
+  local ok, slot = pcall(GetInventorySlotInfo, "AmmoSlot")
+  CTK.Print("ammo slot id: " .. tostring(slot) .. " (ok " .. tostring(ok) .. ")")
+  if ok and slot then
+    CTK.Print("link: " .. tostring(GetInventoryItemLink("player", slot)))
+    CTK.Print("icon: " .. tostring(GetInventoryItemTexture("player", slot)))
+    CTK.Print("count: " .. tostring(GetInventoryItemCount("player", slot)))
   end
-  return GetInventoryItemCount("player", slot) or 0, GetInventoryItemTexture("player", slot)
+  local rok, rslot = pcall(GetInventorySlotInfo, "RangedSlot")
+  CTK.Print("ranged slot id: " .. tostring(rslot) .. ", link: " .. tostring(rok and rslot and GetInventoryItemLink("player", rslot)))
+  CTK.Print("bow, gun or crossbow in hand: " .. tostring(HasAmmoWeapon()) .. ", ammo in bags: " .. tostring(BagsHaveAmmo()))
+  local shots = EquippedAmmo()
+  CTK.Print("the box reads: " .. tostring(shots) .. " shots (limit " .. tostring(CTK.char and CTK.char.ammoBoxShots or 100) .. ")")
 end
 
 local function UpdateAmmoBox()

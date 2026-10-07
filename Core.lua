@@ -7,7 +7,7 @@
 ClassToolkit = {}
 local CTK = ClassToolkit
 
-CTK.VERSION = "1.5.2"
+CTK.VERSION = "1.5.3"
 CTK.movingIcons = false
 CTK.modules = {}   -- each module registers { update = function() } so settings changes reach it
 
@@ -262,6 +262,9 @@ local function SlashHandler(msg)
     return
   elseif cmd == "commands" then
     ChatHelp()
+    return
+  elseif cmd == "ammodebug" then
+    if CTK.AmmoDebug then CTK.AmmoDebug() end
     return
   elseif cmd == "ammo" and tonumber(rest) then
     local shots = math.max(1, math.floor(tonumber(rest)))
