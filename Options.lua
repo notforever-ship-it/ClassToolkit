@@ -43,6 +43,7 @@ local TIPS = {
     "and what to do: Shoot, Ease off, Hold, or Feign Death. Threat is estimated from the combat log and " ..
     "corrected by what the mob attacks, so it learns your server's numbers as you fight.",
   feed = "A happiness face when your pet stops being happy. Click it to feed.",
+  eatWarn = "An icon on screen while your pet is eating, to remind you not to attack: attacking cancels the meal. It goes away when the pet has finished eating.",
   ammoBox = "A red box on screen when the ammo you have equipped is low (100 shots to start; /ctk ammo 50 to change), or when a bow or gun has no ammo equipped.",
 }
 

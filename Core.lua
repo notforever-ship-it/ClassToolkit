@@ -7,7 +7,7 @@
 ClassToolkit = {}
 local CTK = ClassToolkit
 
-CTK.VERSION = "1.5.3"
+CTK.VERSION = "1.5.4"
 CTK.movingIcons = false
 CTK.modules = {}   -- each module registers { update = function() } so settings changes reach it
 
@@ -98,6 +98,7 @@ local function ClassDefaults(class)
     range = true,
     rangeSpell = false,   -- false: the class's main attack (see Range.lua); a name: that spell
     feed = hunter,
+    eatWarn = hunter,     -- the "pet is eating: don't attack" icon
     aggro = hunter,       -- the aggro meter: your threat against your pet's on the mob you target
     aggroGrowl = false,   -- false: Growl's threat by its rank; a number: what you set with /ctk aggro growl
     aggroScale = 1,       -- how much more (or less) the pet's threat is worth than counted, learned from fights
@@ -159,6 +160,7 @@ CTK.TOGGLES = {
   { key = "range", command = "range", label = "Range icon" },
   { key = "aggro", command = "aggro", label = "Aggro meter", class = "HUNTER" },
   { key = "feed", command = "feed", label = "Pet feed reminder", class = "HUNTER" },
+  { key = "eatWarn", command = "eating", label = "Pet eating warning", class = "HUNTER" },
   { key = "ammoBox", command = "ammo", label = "Low ammo box", class = "HUNTER" },
 }
 

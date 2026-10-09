@@ -61,6 +61,7 @@ local HELP_TEXT = table.concat({
     "Growl is worth on your server. " .. WHITE .. "/ctk aggro growl 170" .. END .. " sets it, " .. WHITE .. "/ctk aggro reset" ..
     END .. " forgets.",
   "- Feed reminder: a happiness face when your pet isn't happy. Click it, then click a food in your bags.",
+  "- Eating warning: while your pet is eating, a " .. YELLOW .. "Pet is eating: don't attack" .. END .. " icon shows. Attacking cancels the meal, so wait until the icon is gone.",
   " ",
   GOLD .. "Commands" .. END,
   WHITE .. "/ctk help" .. END .. " this window     " .. WHITE .. "/ctk commands" .. END .. " every command in chat",
@@ -72,7 +73,7 @@ local frame
 local function Build()
   frame = CreateFrame("Frame", "ClassToolkitHelp", UIParent)
   frame:SetWidth(500)
-  frame:SetHeight(740)
+  frame:SetHeight(770)
   frame:SetPoint("CENTER", UIParent, "CENTER", 0, 20)
   frame:SetFrameStrata("DIALOG")
   frame:SetClampedToScreen(true)
@@ -104,7 +105,7 @@ local function Build()
   local text = frame:CreateFontString(nil, "ARTWORK", "GameFontHighlightSmall")
   text:SetPoint("TOPLEFT", frame, "TOPLEFT", 26, -64)
   text:SetWidth(448)
-  text:SetHeight(620)
+  text:SetHeight(650)
   text:SetJustifyH("LEFT")
   text:SetJustifyV("TOP")
   text:SetText(HELP_TEXT)

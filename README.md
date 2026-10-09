@@ -7,7 +7,7 @@ Small, useful helpers for every class on Ravencraft (and other 1.12.1 servers). 
 - **Spell ready icons.** Watch as many spells as you like. Each gets an icon that greys out with a countdown on cooldown, turns blue without the mana (or rage, or energy), red when the target is out of range, and says **READY** when you can cast it. Or keep **one** icon that shows whichever watched spell is ready first. Hunters start with Arcane Shot.
 - **Reagent and ammo warnings.** A chat and mid-screen warning when you run low on a reagent you carry (Soul Shards, Ankhs, runes, candles, symbols, seeds, Flash Powder), and hunters' ammo at 200 and 50 shots.
 - **Low ammo box** for hunters: a red box on screen when you're down to your last 2 spare stacks of arrows or bullets, when the ammo you have equipped is down to 100 shots (`/ctk ammo <shots>` to change), or when a bow, gun or crossbow is in your hand with no ammo equipped. It looks only at the equipped stack, not your bags.
-- **Hunters:** a **range icon** (In range, Dead zone, Melee, Out of range) and a **pet feed reminder** that you click to feed.
+- **Hunters:** a **range icon** (In range, Dead zone, Melee, Out of range) a **pet feed reminder** that you click to feed, and a **pet eating warning** that tells you not to attack while your pet eats.
 
 These started out in [PokeHuntLog](https://github.com/notforever-ship-it/PokeHuntLog), the hunter pet collection log, and moved here so every class can use them.
 
@@ -61,7 +61,7 @@ A reminder only appears once you know the spell. Buffs from other players count 
 | `/ctk move` | Unlock or lock the icons and bars so you can drag them |
 | `/ctk swing`, `/ctk ranged` | Melee timer, Auto Shot / wand timer on or off |
 | `/ctk ready`, `/ctk buffs`, `/ctk reagents` | Spell ready icons, buff reminder, reagent warnings on or off |
-| `/ctk range`, `/ctk feed`, `/ctk ammo` | Hunters: range icon, feed reminder, low ammo box on or off |
+| `/ctk range`, `/ctk feed`, `/ctk eating`, `/ctk ammo` | Hunters: range icon, feed reminder, pet eating warning, low ammo box on or off |
 | `/ctk ammo <shots>` | Hunters: show the low ammo box when your equipped ammo is down to this many shots (100 to start) |
 | `/ctk watch <spell>` / `/ctk unwatch <spell>` | Add or remove a spell ready icon |
 | `/ctk ready all` / `/ctk ready one` | An icon for every watched spell, or one for the next one ready |
@@ -98,6 +98,10 @@ Made by stealthzi.
 MIT, see [LICENSE](LICENSE).
 
 ## Changelog
+
+### 1.5.4
+
+- **Pet eating warning for hunters.** After you feed your pet, an icon with the Feed Pet picture and the words "Pet is eating: don't attack" shows while the pet has the eating buff, and goes away the moment the buff is gone. Attacking while the pet eats cancels the meal. Its own switch in `/ctk` (on to start), `/ctk eating` in chat, and you can drag it like the other icons.
 
 ### 1.5.3
 

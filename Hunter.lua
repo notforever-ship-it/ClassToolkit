@@ -3,6 +3,9 @@
 --
 -- Feed reminder: GetPetHappiness() drops from Happy (3) to Content (2) to Unhappy (1). The reminder shows
 -- while the pet is below the chosen level and isn't already eating. Clicking it casts Feed Pet.
+--
+-- Eating warning: while the pet has the Feed Pet Effect buff, an icon says not to attack, because fighting
+-- cancels the meal. It goes away the moment the buff is gone from the pet.
 
 local CTK = ClassToolkit
 
@@ -23,11 +26,31 @@ local lastHappiness, happinessSince, lastFed = nil, nil, nil
 -- Feed reminder
 ------------------------------------------------------------------------------------------------
 
+-- Is this pet buff the eating buff? The texture is the quick check. If the server uses a different picture,
+-- the buff's tooltip name ("Feed Pet Effect") is read once per picture and remembered.
+local textureIsFeed = {}   -- [texture] = true / false, filled in as buffs are seen
+
+local function IsFeedBuff(i, texture)
+  if texture == FEED_EFFECT_ICON then return true end
+  local known = textureIsFeed[texture]
+  if known ~= nil then return known end
+  local found = false
+  local tip = CTK.ScanTooltip()
+  if tip.SetUnitBuff then
+    tip:SetUnitBuff("pet", i)
+    local name = CTK.ScanLine("Left", 1)
+    if name and string.find(name, "Feed Pet") then found = true end
+    tip:Hide()
+  end
+  textureIsFeed[texture] = found
+  return found
+end
+
 local function PetIsEating()
   for i = 1, 16 do
     local texture = UnitBuff("pet", i)
     if not texture then break end
-    if texture == FEED_EFFECT_ICON then return true end
+    if IsFeedBuff(i, texture) then return true end
   end
   return false
 end
@@ -87,6 +110,54 @@ local function UpdateFeed(fromEvent)
     feedFrame:Hide()
   end
   lastHappiness = happiness
+end
+
+------------------------------------------------------------------------------------------------
+-- Eating warning: attacking while the pet eats cancels the meal
+------------------------------------------------------------------------------------------------
+
+local eatFrame
+local eatWasEating = false
+
+local function UpdateEating()
+  if not eatFrame or CTK.movingIcons then return end
+  local c = CTK.char
+  local _, isHunterPet = HasPetUI()
+  if not c.eatWarn or not CTK.IsClass("HUNTER") or not isHunterPet or not UnitExists("pet") or UnitIsDead("pet") then
+    eatFrame:Hide()
+    eatWasEating = false
+    return
+  end
+  if PetIsEating() then
+    if not eatWasEating then
+      eatWasEating = true
+      CTK.Debug("pet started eating")
+    end
+    eatFrame.icon:SetTexture(FEED_EFFECT_ICON)
+    CTK.SetIconState(eatFrame, 1, 0.82, 0, "Pet is eating: don't attack")
+    eatFrame:Show()
+  else
+    eatWasEating = false
+    eatFrame:Hide()
+  end
+end
+
+local function CreateEatFrame()
+  eatFrame = CTK.CreateIcon("ClassToolkitEatWarning", UIParent, 44)
+  CTK.MakeDraggable(eatFrame, "eating", 0, 120)
+  eatFrame.icon:SetTexture(FEED_EFFECT_ICON)
+  eatFrame:EnableMouse(false)   -- only while unlocked, so it never blocks clicks on the world
+  eatFrame.label:SetFont(STANDARD_TEXT_FONT, 13)
+
+  -- The pet's buffs change with UNIT_AURA; this is a light safety net in case an event is missed.
+  local elapsed = 0
+  eatFrame.watcher = CreateFrame("Frame")
+  eatFrame.watcher:SetScript("OnUpdate", function()
+    elapsed = elapsed + arg1
+    if elapsed < 0.5 then return end
+    elapsed = 0
+    if CTK.char and CTK.char.eatWarn then UpdateEating() end
+  end)
 end
 
 ------------------------------------------------------------------------------------------------
@@ -237,6 +308,15 @@ local function Update()
     else
       feedFrame:Hide()
     end
+    if c.eatWarn and hunter then
+      eatFrame.icon:SetTexture(FEED_EFFECT_ICON)
+      CTK.SetIconState(eatFrame, 1, 0.82, 0, "Eating warning (drag)")
+      eatFrame:EnableMouse(true)
+      eatFrame:Show()
+    else
+      eatFrame:EnableMouse(false)
+      eatFrame:Hide()
+    end
     ammoBox:EnableMouse(c.ammoBox and hunter and true or false)
     if c.ammoBox and hunter then
       ammoBox.icon:SetTexture("Interface\\Icons\\INV_Ammo_Arrow_02")
@@ -249,7 +329,9 @@ local function Update()
     return
   end
   ammoBox:EnableMouse(false)
+  eatFrame:EnableMouse(false)
   UpdateFeed(false)
+  UpdateEating()
   UpdateAmmoBox()
 end
 
@@ -279,6 +361,7 @@ function CTK.InitHunter()
   feedFrame:SetScript("OnLeave", function() GameTooltip:Hide() end)
 
   CreateAmmoBox()
+  CreateEatFrame()
 
   local f = CreateFrame("Frame")
   local events = { "UNIT_HAPPINESS", "UNIT_PET", "UNIT_AURA", "PLAYER_ENTERING_WORLD", "BAG_UPDATE",
@@ -290,14 +373,17 @@ function CTK.InitHunter()
     if event == "UNIT_HAPPINESS" then
       UpdateFeed(true)
     elseif event == "UNIT_AURA" then
-      if arg1 == "pet" then UpdateFeed(false) end
+      if arg1 == "pet" then
+        UpdateFeed(false)
+        UpdateEating()
+      end
     elseif event == "UNIT_PET" then
       if arg1 == "player" then
         lastHappiness = nil
-        CTK.After(1, function() UpdateFeed(false) end)
+        CTK.After(1, function() UpdateFeed(false) UpdateEating() end)
       end
     elseif event == "PLAYER_ENTERING_WORLD" then
-      CTK.After(2, function() UpdateFeed(false) end)
+      CTK.After(2, function() UpdateFeed(false) UpdateEating() end)
       QueueAmmoBox()
     elseif event == "BAG_UPDATE" or (event == "UNIT_INVENTORY_CHANGED" and arg1 == "player") then
       QueueAmmoBox()
