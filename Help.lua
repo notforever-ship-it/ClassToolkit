@@ -4,76 +4,113 @@ local CTK = ClassToolkit
 
 local GOLD, GREEN, RED, YELLOW, BLUE, GREY, WHITE, END =
   "|cffffd100", "|cff40ff40", "|cffff4040", "|cffffff40", "|cff6080ff", "|cff9d9d9d", "|cffffffff", "|r"
+local ORANGE, PURPLE = "|cffff9933", "|cffb366ff"
 
-local HELP_TEXT = table.concat({
-  GOLD .. "Getting started" .. END,
-  "- " .. WHITE .. "/ctk" .. END .. " opens the options. Only the switches that fit your class are shown, and " ..
-    "settings are kept per character.",
-  "- " .. WHITE .. "Unlock icons" .. END .. " lets you drag every icon and bar; press " .. WHITE .. "Lock icons" .. END ..
-    " when you're done. Shift-drag works any time.",
-  "- Range checks need the spell on an " .. WHITE .. "action bar" .. END .. ": any slot, even a page you never show.",
+local function B(s) return WHITE .. s .. END end
+
+local HELP_LEFT = table.concat({
+  GOLD .. "Start" .. END,
+  "- " .. B("/ctk") .. " opens the options. Only your class's switches show.",
+  "- Settings are kept per character.",
+  "- " .. B("Unlock icons") .. ": drag any icon or bar. Press " .. B("Lock icons") .. " when done.",
+  "- Shift-drag moves them any time.",
+  "- Range checks need the spell on an " .. B("action bar") .. " (any slot, any page).",
   " ",
   GOLD .. "Swing timer" .. END,
-  "- Bars count down to your next melee swing, Auto Shot or wand shot, then say " .. GREEN .. "ready" .. END .. ".",
-  "- The " .. RED .. "red" .. END .. " end of the Auto Shot bar is the aim: stand still then, or the shot is delayed.",
-  "- With SuperWoW there's an off-hand bar too.",
+  "- Bars count down to your next swing, Auto Shot or wand shot.",
+  "- They say " .. GREEN .. "ready" .. END .. " when it is time.",
+  "- Auto Shot: at the " .. RED .. "red" .. END .. " end, stand still or the shot is delayed.",
+  "- With SuperWoW you get an off-hand bar too.",
   " ",
   GOLD .. "Buff reminder" .. END,
-  "- An icon appears when a buff your class keeps up is " .. RED .. "missing" .. END .. ", or " .. YELLOW .. "running out" .. END ..
-    " (with the seconds left).",
-  "- Click it to cast. Right-click to stop that reminder; " .. WHITE .. "/ctk buffs reset" .. END .. " brings them back.",
-  "- Hunters: a red " .. WHITE .. "in combat!" .. END .. " icon when Cheetah or Pack is still on in a fight.",
+  "- An icon shows when a class buff is " .. RED .. "missing" .. END .. " or " .. YELLOW .. "running out" .. END .. ".",
+  "- Running out shows the seconds left.",
+  "- Click it to cast. Right-click to stop that reminder.",
+  "- " .. B("/ctk buffs reset") .. " brings stopped reminders back.",
+  "- Hunters: " .. B("in combat!") .. " shows if Cheetah or Pack is on in a fight.",
   " ",
   GOLD .. "Spell ready icons" .. END,
-  "- Add as many spells as you like in " .. WHITE .. "/ctk" .. END .. ". Shown in combat or while you " ..
-    "target an enemy; they wrap onto another line past six.",
-  "- " .. WHITE .. "Ready icons: just the next one" .. END .. " keeps a single icon instead: whichever spell " ..
-    "you can cast now, or the one coming back soonest.",
-  "- " .. GREY .. "Grey + number" .. END .. " cooling down   " .. BLUE .. "Blue" .. END .. " not enough mana/rage/energy   " ..
-    RED .. "Red" .. END .. " out of range   " .. GREEN .. "READY" .. END .. " go",
-  "- " .. WHITE .. "DoTs" .. END .. ": a watched spell that does damage over time (Corruption, Serpent Sting, Rend, " ..
-    "Moonfire, Immolate...) counts down in |cffb366ffpurple|r while it ticks on the target you have, turns " ..
-    "|cffff9933ending|r for the last 3 seconds, then says " .. GREEN .. "APPLY" .. END .. ". Only your current target " ..
-    "counts; switch targets and the icon follows.",
-  "- The addon reads the DoT's length from the spell's tooltip. " .. WHITE .. "/ctk dot" .. END .. " lists what it found; " ..
-    WHITE .. "/ctk dot Rend 12" .. END .. " corrects one, " .. WHITE .. "off" .. END .. " or " .. WHITE .. "auto" .. END .. " instead of a number.",
+  "- Add spells in " .. B("/ctk") .. ". As many as you like.",
+  "- Shown in combat or with an enemy targeted.",
+  "- More than six wrap onto a new line.",
+  "- " .. B("Ready icons: just the next one") .. ": one icon for the next spell ready.",
+  "- " .. GREY .. "Grey + number" .. END .. ": cooling down.   " .. BLUE .. "Blue" .. END .. ": not enough mana, rage or energy.",
+  "- " .. RED .. "Red" .. END .. ": out of range.   " .. GREEN .. "READY" .. END .. ": go.",
   " ",
-  GOLD .. "Reagents and ammo" .. END,
-  "- A chat warning when a reagent you carry runs low. " .. WHITE .. "/ctk counts" .. END .. " lists what you have.",
-  "- Hunters: warnings at 200 and 50 shots, and a " .. RED .. "Low ammo" .. END .. " box on screen when the ammo you " ..
-    "have equipped is down to 100 shots (" .. WHITE .. "/ctk ammo 50" .. END .. " to change). It only looks at the equipped stack, not your bags.",
-  " ",
-  GOLD .. "Range icon" .. END,
-  "- Watches one spell, your class's main attack to start (Fireball, Shadow Bolt, Heroic Strike, Auto Shot...). " ..
-    WHITE .. "/ctk range <spell>" .. END .. " or the box in /ctk picks another.",
-  "- " .. GREEN .. "In range" .. END .. " (with the yards)  " .. GREEN .. "Melee" .. END .. "  |cffff9933Under 10 yd|r  " ..
-    YELLOW .. "Under 28 yd" .. END .. "  " .. GREY .. "Out of range" .. END .. ". Hunters: " .. RED .. "Dead zone" .. END ..
-    " when neither shot nor Wing Clip lands.",
-  "- The spell has to be on an action bar (any slot) for its range to be read.",
-  " ",
-  GOLD .. "Hunters" .. END,
-  "- Aggro meter: how close you are to pulling the mob off your pet, who it's really attacking, and what to do: " ..
-    GREEN .. "Shoot" .. END .. ", " .. YELLOW .. "Ease off" .. END .. " (a crit could pull it), |cffff9933Hold|r (your next shot " ..
-    "pulls it), " .. RED .. "ON YOU - Feign Death!" .. END .. " Early in a fight it says Hold a lot: one good shot beats a " ..
-    "single Growl, so let the pet bite a few times first.",
-  "- Threat is counted from the combat log (damage, Growl, Distracting Shot, Feign Death); a mob turns on you past 130% " ..
-    "of your pet's threat, 110% up close. When the mob's real target disagrees, the count gives way and learns what " ..
-    "Growl is worth on your server. " .. WHITE .. "/ctk aggro growl 170" .. END .. " sets it, " .. WHITE .. "/ctk aggro reset" ..
-    END .. " forgets.",
-  "- Feed reminder: a happiness face when your pet isn't happy. Click it, then click a food in your bags.",
-  "- Eating warning: while your pet is eating, a " .. YELLOW .. "Pet is eating: don't attack" .. END .. " icon shows. Attacking cancels the meal, so wait until the icon is gone.",
-  " ",
-  GOLD .. "Commands" .. END,
-  WHITE .. "/ctk help" .. END .. " this window     " .. WHITE .. "/ctk commands" .. END .. " every command in chat",
-  WHITE .. "/ctk debug on" .. END .. " shows what the addon notices, handy for bug reports",
+  GOLD .. "DoTs" .. END .. " (damage over time, like Corruption or Serpent Sting)",
+  "- Counts down in " .. PURPLE .. "purple" .. END .. " while it ticks on your target.",
+  "- Turns " .. ORANGE .. "orange" .. END .. " for the last 3 seconds, then says " .. GREEN .. "APPLY" .. END .. ".",
+  "- Only your current target counts. The icon follows when you switch.",
+  "- " .. B("/ctk dot") .. ": the lengths it read from the spell tooltips.",
+  "- " .. B("/ctk dot Rend 12") .. " fixes one. Use " .. B("off") .. " or " .. B("auto") .. " in place of the number.",
 }, "\n")
 
+local HELP_RIGHT = table.concat({
+  GOLD .. "Reagents and ammo" .. END,
+  "- A chat warning when a reagent runs low.",
+  "- " .. B("/ctk counts") .. " lists your reagents and ammo.",
+  "- Hunters: warnings at 200 and 50 shots.",
+  "- Hunters: a " .. RED .. "Low ammo" .. END .. " box when equipped ammo is down to 100 shots.",
+  "- " .. B("/ctk ammo 50") .. " changes that. Only the equipped stack counts.",
+  " ",
+  GOLD .. "Range icon" .. END,
+  "- Watches your class's main attack to start.",
+  "- " .. B("/ctk range <spell>") .. ", or the box in " .. B("/ctk") .. ", picks another.",
+  "- " .. GREEN .. "In range" .. END .. " (with yards), " .. GREEN .. "Melee" .. END .. ", " .. ORANGE .. "Under 10 yd" .. END ..
+    ", " .. YELLOW .. "Under 28 yd" .. END .. ", " .. GREY .. "Out of range" .. END .. ".",
+  "- Hunters: " .. RED .. "Dead zone" .. END .. " = neither shot nor Wing Clip lands.",
+  " ",
+  GOLD .. "Hunters" .. END,
+  "- " .. B("Aggro meter") .. ": how close you are to pulling the mob off your pet.",
+  "- It shows who the mob attacks, and what to do:",
+  "- " .. GREEN .. "Shoot" .. END .. ".  " .. YELLOW .. "Ease off" .. END .. ": a crit could pull it.  " ..
+    ORANGE .. "Hold" .. END .. ": your next shot pulls it.",
+  "- " .. RED .. "ON YOU - Feign Death!" .. END,
+  "- Early on it says Hold a lot. Let the pet bite a few times first.",
+  "- Threat comes from the combat log. It learns your server's Growl.",
+  "- The mob turns on you past 130% of pet threat (110% up close).",
+  "- " .. B("/ctk aggro growl 170") .. " sets Growl.   " .. B("/ctk aggro reset") .. " forgets.",
+  "- " .. B("Feed reminder") .. ": a face when your pet is not happy. Click it, then a food.",
+  "- " .. B("Eating warning") .. ": " .. YELLOW .. "Pet is eating: don't attack" .. END .. ". Attacking ends the meal.",
+  " ",
+  GOLD .. "Commands" .. END,
+  "- " .. B("/ctk help") .. ": this window.",
+  "- " .. B("/ctk commands") .. ": every command in chat.",
+  "- " .. B("/ctk debug on") .. ": shows what the addon notices, for bug reports.",
+}, "\n")
+
+local COLUMN = 420   -- width of each text column
 local frame
+
+-- Sizes a font string to its text and returns the height. If the client gives no height,
+-- it counts the lines instead.
+local function FitHeight(fs, text, width)
+  fs:SetWidth(width)
+  fs:SetHeight(0)   -- 0 = size to the text
+  fs:SetText(text)
+  local h = fs:GetHeight()
+  if not h or h < 20 then
+    local _, size = fs:GetFont()
+    if type(size) ~= "number" or size < 1 then size = 12 end
+    local lines = 0
+    for line in string.gfind(text .. "\n", "(.-)\n") do
+      fs:SetWidth(0)
+      fs:SetText(line)
+      local n = math.ceil((fs:GetStringWidth() or 0) / (width * 0.9))
+      if n < 1 then n = 1 end
+      lines = lines + n
+    end
+    fs:SetWidth(width)
+    fs:SetText(text)
+    h = lines * (size + 2)
+  end
+  fs:SetHeight(h)
+  return h
+end
 
 local function Build()
   frame = CreateFrame("Frame", "ClassToolkitHelp", UIParent)
-  frame:SetWidth(500)
-  frame:SetHeight(770)
+  frame:SetWidth(26 + COLUMN + 24 + COLUMN + 26)
   frame:SetPoint("CENTER", UIParent, "CENTER", 0, 20)
   frame:SetFrameStrata("DIALOG")
   frame:SetClampedToScreen(true)
@@ -102,13 +139,22 @@ local function Build()
   local close = CreateFrame("Button", "ClassToolkitHelpClose", frame, "UIPanelCloseButton")
   close:SetPoint("TOPRIGHT", frame, "TOPRIGHT", -6, -6)
 
-  local text = frame:CreateFontString(nil, "ARTWORK", "GameFontHighlightSmall")
-  text:SetPoint("TOPLEFT", frame, "TOPLEFT", 26, -64)
-  text:SetWidth(448)
-  text:SetHeight(650)
-  text:SetJustifyH("LEFT")
-  text:SetJustifyV("TOP")
-  text:SetText(HELP_TEXT)
+  -- Two columns side by side, so the window is not taller than the screen.
+  local left = frame:CreateFontString(nil, "ARTWORK", "GameFontHighlightSmall")
+  left:SetPoint("TOPLEFT", frame, "TOPLEFT", 26, -64)
+  left:SetJustifyH("LEFT")
+  left:SetJustifyV("TOP")
+  local right = frame:CreateFontString(nil, "ARTWORK", "GameFontHighlightSmall")
+  right:SetPoint("TOPLEFT", frame, "TOPLEFT", 26 + COLUMN + 24, -64)
+  right:SetJustifyH("LEFT")
+  right:SetJustifyV("TOP")
+  local th = math.max(FitHeight(left, HELP_LEFT, COLUMN), FitHeight(right, HELP_RIGHT, COLUMN))
+  local height = th + 64 + 60   -- title above, Got it button and credit below
+  frame:SetHeight(height)
+  local screen = UIParent:GetHeight()
+  if screen and screen > 100 and height > screen - 40 then
+    frame:SetScale((screen - 40) / height)   -- shrink to fit a small screen
+  end
 
   local ok = CreateFrame("Button", "ClassToolkitHelpOk", frame, "UIPanelButtonTemplate")
   ok:SetWidth(120)

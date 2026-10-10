@@ -230,25 +230,31 @@ end
 
 local function ChatHelp()
   CTK.Print("v" .. CTK.VERSION .. " commands:")
-  CTK.Print("/ctk - open the options window")
-  CTK.Print("/ctk help - how to use Class Toolkit")
-  CTK.Print("/ctk move - unlock or lock the icons and bars so you can drag them")
+  CTK.Print("/ctk - options window")
+  CTK.Print("/ctk help - how to use")
+  CTK.Print("/ctk move - unlock or lock the icons for dragging")
   for i = 1, table.getn(CTK.TOGGLES) do
     local t = CTK.TOGGLES[i]
     CTK.Print("/ctk " .. t.command .. " - " .. string.lower(t.label) .. " on or off" ..
       (t.class and " (hunters)" or ""))
   end
-  CTK.Print("/ctk range <spell> - the spell the range icon watches (default: your class's main attack)")
-  CTK.Print("/ctk watch <spell> - add a spell ready icon, /ctk unwatch <spell> - remove it")
-  CTK.Print("/ctk dot - which watched spells count as DoTs; /ctk dot <spell> <seconds> | off | auto to correct one")
-  CTK.Print("/ctk ready all | one - an icon for every watched spell, or one for the next one ready")
-  CTK.Print("/ctk aggro growl <threat> | auto - what one Growl is worth; /ctk aggro reset - forget what it learned")
-  CTK.Print("/ctk feed content | unhappy | sound - when the feed reminder shows, and its sound")
-  CTK.Print("/ctk ammo <shots> - hunters: show the low ammo box when your equipped ammo is down to this many shots (100 to start)")
-  CTK.Print("/ctk buffs reset - bring back buff reminders you right-clicked away")
+  CTK.Print("/ctk range <spell> - spell the range icon watches")
+  CTK.Print("/ctk watch <spell> - add a spell ready icon")
+  CTK.Print("/ctk unwatch <spell> - remove one")
+  CTK.Print("/ctk ready all | one - every watched spell, or just the next one")
+  CTK.Print("/ctk dot - list the DoT lengths")
+  CTK.Print("/ctk dot <spell> <seconds> | off | auto - fix one")
+  CTK.Print("/ctk aggro growl <threat> | auto - set what Growl is worth")
+  CTK.Print("/ctk aggro reset - forget what it learned")
+  CTK.Print("/ctk feed content | unhappy - when the feed reminder shows")
+  CTK.Print("/ctk feed sound - feed reminder sound on or off")
+  CTK.Print("/ctk ammo <shots> - low ammo box level (100 to start)")
+  CTK.Print("/ctk ammodebug - what the game says about your ammo slot")
+  CTK.Print("/ctk buffs reset - bring back hidden buff reminders")
   CTK.Print("/ctk counts - list your reagents and ammo")
-  CTK.Print("/ctk version - show which version you have")
-  CTK.Print("/ctk reset - put this character's settings and all icon positions back to default")
+  CTK.Print("/ctk version - show your version")
+  CTK.Print("/ctk debug on | off - show what the addon notices, for bug reports")
+  CTK.Print("/ctk reset - this character's settings and all icon positions back to default")
 end
 
 local function SlashHandler(msg)
@@ -381,8 +387,7 @@ loader:SetScript("OnEvent", function()
     CTK.ApplyDefaults()
     if not CTK.char.welcomed and CTK.char.class then
       CTK.char.welcomed = true
-      CTK.Print("v" .. CTK.VERSION .. " loaded. Type /ctk to choose what shows for your " ..
-        string.lower(CTK.char.class) .. ", or /ctk help for how it all works.")
+      CTK.Print("v" .. CTK.VERSION .. " loaded. /ctk: options. /ctk help: how to use.")
     end
     CTK.After(1, CTK.UpdateAll)
   end

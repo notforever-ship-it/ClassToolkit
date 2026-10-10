@@ -14,37 +14,41 @@ local WatchLine
 local checks = {}
 local watchLines = {}
 
+-- text is one line, or a list of short lines.
 local function Explain(widget, title, text)
   widget:SetScript("OnEnter", function()
     GameTooltip:SetOwner(this, "ANCHOR_RIGHT")
     GameTooltip:SetText(title)
-    GameTooltip:AddLine(text, 1, 1, 1, 1)
+    if type(text) == "table" then
+      for i = 1, table.getn(text) do GameTooltip:AddLine(text[i], 1, 1, 1, 1) end
+    else
+      GameTooltip:AddLine(text, 1, 1, 1, 1)
+    end
     GameTooltip:Show()
   end)
   widget:SetScript("OnLeave", function() GameTooltip:Hide() end)
 end
 
 local TIPS = {
-  swingMelee = "Bars counting down to your next melee swing. With SuperWoW there's an off-hand bar too.",
-  swingRanged = "Counts down to your next Auto Shot or wand shot. On Auto Shot the red end is the aim: " ..
-    "stand still then or the shot is delayed.",
-  ready = "An icon for each watched spell: greyed out with a countdown on cooldown, blue without the mana, " ..
-    "red out of range, READY when you can cast it. A DoT counts down in purple while it ticks on your target, " ..
-    "then says APPLY. Shown in combat or while targeting an enemy.",
-  readyOne = "Keep one icon instead of a row: it shows whichever watched spell you can cast now, or the " ..
-    "one coming back soonest.",
-  buffs = "An icon appears when a buff your class keeps up is missing or about to run out. Click it to " ..
-    "cast, right-click to stop that reminder.",
-  reagents = "A warning when you run low on a reagent you carry, and hunters' ammo at 200 and 50 shots.",
-  range = "Whether your target is in range of one spell, your class's main attack to start: In range, Melee, " ..
-    "Under 10 yd, Under 28 yd or Out of range. Hunters also get the dead zone. The spell must be on an action " ..
-    "bar (any slot). Pick another spell below.",
-  aggro = "A bar showing how close you are to pulling the mob off your pet, who the mob is really attacking, " ..
-    "and what to do: Shoot, Ease off, Hold, or Feign Death. Threat is estimated from the combat log and " ..
-    "corrected by what the mob attacks, so it learns your server's numbers as you fight.",
-  feed = "A happiness face when your pet stops being happy. Click it to feed.",
-  eatWarn = "An icon on screen while your pet is eating, to remind you not to attack: attacking cancels the meal. It goes away when the pet has finished eating.",
-  ammoBox = "A red box on screen when the ammo you have equipped is low (100 shots to start; /ctk ammo 50 to change), or when a bow or gun has no ammo equipped.",
+  swingMelee = { "Counts down to your next melee swing.", "SuperWoW adds an off-hand bar." },
+  swingRanged = { "Counts down to your next Auto Shot or wand shot.",
+    "Auto Shot: at the red end, stand still or the shot is delayed." },
+  ready = { "An icon for each watched spell.", "Grey + number: cooling down.", "Blue: not enough mana.",
+    "Red: out of range.", "READY: cast it.", "DoTs: purple countdown, then APPLY.",
+    "Shown in combat or with an enemy targeted." },
+  readyOne = { "One icon instead of a row.", "Shows the spell ready now, or back soonest." },
+  buffs = { "An icon when a class buff is missing or running out.", "Click: cast it.",
+    "Right-click: stop that reminder." },
+  reagents = { "A warning when a reagent runs low.", "Hunters: ammo at 200 and 50 shots." },
+  range = { "Is your target in range of one spell?", "Starts on your class's main attack.",
+    "In range, Melee, Under 10 yd, Under 28 yd, Out of range.", "Hunters also get Dead zone.",
+    "The spell must be on an action bar (any slot).", "Pick another spell below." },
+  aggro = { "How close you are to pulling the mob off your pet.", "Shows who the mob attacks.",
+    "Says what to do: Shoot, Ease off, Hold, Feign Death.", "Learns your server's numbers as you fight." },
+  feed = { "A face when your pet is not happy.", "Click it to feed." },
+  eatWarn = { "Shows while your pet eats.", "Don't attack: it cancels the meal.", "Goes away when the meal is done." },
+  ammoBox = { "A red box when your equipped ammo is low.", "100 shots to start. /ctk ammo 50 changes it.",
+    "Also shows when a bow or gun has no ammo equipped." },
 }
 
 -- One line per watched spell, made as they're added, so you can watch as many as you like.
@@ -137,9 +141,8 @@ local function Build()
   rangeBox:SetAutoFocus(false)
   rangeBox:SetScript("OnEnterPressed", SetRangeSpell)
   rangeBox:SetScript("OnEscapePressed", function() this:SetText("") this:ClearFocus() end)
-  Explain(rangeBox, "Range icon spell", "Type a spell's name as your spellbook shows it and press Enter or Set. " ..
-    "The icon then says whether your target is in that spell's range. Leave it empty and press Set to go back " ..
-    "to your class's main attack.")
+  Explain(rangeBox, "Range icon spell", { "Type a spell name as your spellbook shows it.", "Press Enter or Set.",
+    "Empty + Set: back to your class's main attack." })
   rangeButton = CreateFrame("Button", "ClassToolkitRangeSet", frame, "UIPanelButtonTemplate")
   rangeButton:SetWidth(70)
   rangeButton:SetHeight(20)
@@ -159,8 +162,8 @@ local function Build()
   addBox:SetAutoFocus(false)
   addBox:SetScript("OnEnterPressed", AddWatched)
   addBox:SetScript("OnEscapePressed", function() this:SetText("") this:ClearFocus() end)
-  Explain(addBox, "Add a spell", "Type a spell's name exactly as your spellbook shows it, for example " ..
-    "Arcane Shot or Overpower, then press Enter or Add. Add as many as you like.")
+  Explain(addBox, "Add a spell", { "Type a spell name as your spellbook shows it.", "For example Arcane Shot or Overpower.",
+    "Press Enter or Add.", "Add as many as you like." })
 
   addButton = CreateFrame("Button", "ClassToolkitWatchAdd", frame, "UIPanelButtonTemplate")
   addButton:SetWidth(70)
@@ -173,8 +176,8 @@ local function Build()
   lockButton:SetHeight(22)
   lockButton:SetPoint("BOTTOMLEFT", frame, "BOTTOMLEFT", 20, 40)
   lockButton:SetScript("OnClick", function() CTK.ToggleMoveIcons() end)
-  Explain(lockButton, "Move the icons", "Unlock, drag the icons and bars where you want them, then lock again. " ..
-    "Positions are shared by all your characters.")
+  Explain(lockButton, "Move the icons", { "Unlock, drag the icons and bars, then lock again.",
+    "All your characters share the positions." })
 
   local help = CreateFrame("Button", "ClassToolkitOptionsHelp", frame, "UIPanelButtonTemplate")
   help:SetWidth(80)
@@ -182,7 +185,7 @@ local function Build()
   help:SetPoint("LEFT", lockButton, "RIGHT", 8, 0)
   help:SetText("Help")
   help:SetScript("OnClick", function() CTK.ToggleHelp() end)
-  Explain(help, "How to use", "What each part does, what the colours mean, and every command.")
+  Explain(help, "How to use", { "What each part does.", "What the colours mean.", "Every command." })
 
   local done = CreateFrame("Button", "ClassToolkitDone", frame, "UIPanelButtonTemplate")
   done:SetWidth(80)
