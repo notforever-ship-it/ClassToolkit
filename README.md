@@ -177,7 +177,7 @@ MIT, see [LICENSE](LICENSE).
 
 ### 1.5.5
 
-- **Cooldown ready flash.** When any spell with a cooldown comes back, its icon pops up in the middle of the screen for about a second, then fades. Switch in `/ctk` or `/ctk pulse`; unlock the icons to move it.
+- **Cooldown ready flash.** When a spell with a cooldown over 7 seconds comes back (so not Arcane Shot), its icon pops up in the middle of the screen for about a second, then fades. Switch in `/ctk` or `/ctk pulse`; unlock the icons to move it.
 
 ### 1.5.4
 
