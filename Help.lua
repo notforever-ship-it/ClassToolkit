@@ -36,6 +36,7 @@ local HELP_LEFT = table.concat({
   "- " .. B("Ready icons: just the next one") .. ": one icon for the next spell ready.",
   "- " .. GREY .. "Grey + number" .. END .. ": cooling down.   " .. BLUE .. "Blue" .. END .. ": not enough mana, rage or energy.",
   "- " .. RED .. "Red" .. END .. ": out of range.   " .. GREEN .. "READY" .. END .. ": go.",
+  "- " .. B("Cooldown ready flash") .. ": a spell's icon pops up mid-screen when it is back.",
   " ",
   GOLD .. "DoTs" .. END .. " (damage over time, like Corruption or Serpent Sting)",
   "- Counts down in " .. PURPLE .. "purple" .. END .. " while it ticks on your target.",

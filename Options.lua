@@ -37,6 +37,7 @@ local TIPS = {
     "Red: out of range.", "READY: cast it.", "DoTs: purple countdown, then APPLY.",
     "Shown in combat or with an enemy targeted." },
   readyOne = { "One icon instead of a row.", "Shows the spell ready now, or back soonest." },
+  pulse = { "A spell's icon flashes mid-screen when its cooldown ends.", "Any spell, watched or not. Unlock icons to move it." },
   buffs = { "An icon when a class buff is missing or running out.", "Click: cast it.",
     "Right-click: stop that reminder." },
   reagents = { "A warning when a reagent runs low.", "Hunters: ammo at 200 and 50 shots." },

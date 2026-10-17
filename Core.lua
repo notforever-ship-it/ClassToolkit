@@ -7,7 +7,7 @@
 ClassToolkit = {}
 local CTK = ClassToolkit
 
-CTK.VERSION = "1.5.4"
+CTK.VERSION = "1.5.5"
 CTK.movingIcons = false
 CTK.modules = {}   -- each module registers { update = function() } so settings changes reach it
 
@@ -89,6 +89,7 @@ local function ClassDefaults(class)
     swingMelee = not CASTERS[class],
     swingRanged = hunter or CASTERS[class] or false,  -- Auto Shot, or a wand's Shoot
     ready = true,
+    pulse = true,         -- a spell's icon flashes mid-screen when its cooldown ends
     readyOne = false,   -- one icon showing the next spell ready, instead of one icon each
     watched = hunter and { "Arcane Shot" } or {},
     dotTimes = {},      -- [spell] = seconds you set with /ctk dot; 0 switches a DoT timer off
@@ -155,6 +156,7 @@ CTK.TOGGLES = {
   { key = "swingRanged", command = "ranged", label = "Auto Shot / wand timer" },
   { key = "ready", command = "ready", label = "Spell ready icons" },
   { key = "readyOne", command = "one", label = "Ready icons: just the next one" },
+  { key = "pulse", command = "pulse", label = "Cooldown ready flash" },
   { key = "buffs", command = "buffs", label = "Buff reminder" },
   { key = "reagents", command = "reagents", label = "Reagent and ammo warnings" },
   { key = "range", command = "range", label = "Range icon" },
@@ -375,7 +377,7 @@ loader:SetScript("OnEvent", function()
 
     -- Modules build their frames now; they stay hidden until the character is in the world.
     if CTK.InitWidgets then CTK.InitWidgets() end
-    local inits = { "InitSpells", "InitDots", "InitSwing", "InitReady", "InitBuffs", "InitReagents", "InitRange", "InitAggro", "InitHunter" }
+    local inits = { "InitSpells", "InitDots", "InitSwing", "InitReady", "InitPulse", "InitBuffs", "InitReagents", "InitRange", "InitAggro", "InitHunter" }
     for i = 1, table.getn(inits) do
       local init = CTK[inits[i]]
       if init then

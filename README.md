@@ -10,6 +10,7 @@ Small helpers for every class on Ravencraft and other 1.12.1 servers.
 - **Swing timer**: bars count down to your next swing, Auto Shot or wand shot.
 - **Buff reminder**: an icon when a class buff is missing or running out. Click it to cast.
 - **Spell ready icons**: one icon per spell you watch. Shows cooldown, mana, range and **READY**.
+- **Cooldown ready flash**: a spell's icon pops up mid-screen for a second when its cooldown ends.
 - **DoT timers**: a watched DoT counts down on your target, then says **APPLY**.
 - **Reagent and ammo warnings**: in chat and mid-screen when you run low.
 - **Range icon**: is your target in range of your main attack (or a spell you pick)?
@@ -68,6 +69,7 @@ These started in [PokeHuntLog](https://github.com/notforever-ship-it/PokeHuntLog
 - Red: out of range.
 - **READY**: cast it.
 - **Ready icons: just the next one**: one icon for the next spell ready.
+- **Cooldown ready flash**: any spell's icon pops up mid-screen when its cooldown ends (on by default; unlock icons to move it).
 - Hunters start with Arcane Shot.
 
 ## DoT timers
@@ -123,6 +125,7 @@ These started in [PokeHuntLog](https://github.com/notforever-ship-it/PokeHuntLog
 | `/ctk move` (or `lock`, `unlock`) | Unlock or lock the icons for dragging |
 | `/ctk swing`, `/ctk ranged` | Melee timer, Auto Shot / wand timer on or off |
 | `/ctk ready`, `/ctk one` | Spell ready icons, just the next one, on or off |
+| `/ctk pulse` | Cooldown ready flash on or off |
 | `/ctk buffs`, `/ctk reagents`, `/ctk range` | Buff reminder, reagent warnings, range icon on or off |
 | `/ctk aggro`, `/ctk feed`, `/ctk eating`, `/ctk ammo` | Hunters: aggro meter, feed reminder, eating warning, low ammo box on or off |
 | `/ctk range <spell>` | Spell the range icon watches |
@@ -171,6 +174,10 @@ Made by stealthzi.
 MIT, see [LICENSE](LICENSE).
 
 ## Changelog
+
+### 1.5.5
+
+- **Cooldown ready flash.** When any spell with a cooldown comes back, its icon pops up in the middle of the screen for about a second, then fades. Switch in `/ctk` or `/ctk pulse`; unlock the icons to move it.
 
 ### 1.5.4
 

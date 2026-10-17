@@ -27,7 +27,7 @@ const KNOWN_GLOBALS = new Set((
   "PlaySound GetCursorPosition IsShiftKeyDown IsControlKeyDown IsAltKeyDown " +
   "STANDARD_TEXT_FONT GameFontNormal GameFontNormalSmall GameFontNormalLarge GameFontHighlight GameFontHighlightSmall " +
   // Units, pets, world
-  "UnitExists UnitName UnitLevel UnitCreatureFamily UnitCreatureType UnitIsUnit UnitClass UnitIsPlayer " +
+  "UnitExists UnitName UnitRace UnitLevel UnitCreatureFamily UnitCreatureType UnitIsUnit UnitClass UnitIsPlayer " +
   "UnitPlayerControlled UnitIsDead UnitClassification HasPetUI GetStablePetInfo GetPetLoyalty " +
   "GetRealmName GetZoneText GetRealZoneText GetTime UnitAffectingCombat " +
   // SuperWoW
