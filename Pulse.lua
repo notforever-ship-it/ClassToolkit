@@ -1,12 +1,12 @@
 -- Class Toolkit: cooldown pulse. When a spell with a long cooldown (over 7 seconds, so not Arcane Shot) comes
--- back, its icon pops up in the middle of the screen for about 3 seconds and fades away, so you know to
+-- back, its icon pops up in the middle of the screen for about 5 seconds and fades away, so you know to
 -- use it again. Several at once take turns. Unlock the icons to move it.
 
 local CTK = ClassToolkit
 
 local SIZE = 48
 local MIN_COOLDOWN = 7               -- seconds; short ones like Arcane Shot (6) would flash all the time
-local FADE_IN, HOLD, FADE_OUT = 0.15, 2.5, 0.6
+local FADE_IN, HOLD, FADE_OUT = 0.15, 4.25, 0.6
 local QUESTION = "Interface\\Icons\\INV_Misc_QuestionMark"
 local BOOK = "spell"
 

@@ -10,7 +10,7 @@ Small helpers for every class on Ravencraft and other 1.12.1 servers.
 - **Swing timer**: bars count down to your next swing, Auto Shot or wand shot.
 - **Buff reminder**: an icon when a class buff is missing or running out. Click it to cast.
 - **Spell ready icons**: one icon per spell you watch. Shows cooldown, mana, range and **READY**.
-- **Cooldown ready flash**: a spell's icon pops up mid-screen for about 3 seconds when its cooldown ends.
+- **Cooldown ready flash**: a spell's icon pops up mid-screen for about 5 seconds when its cooldown ends.
 - **DoT timers**: a watched DoT counts down on your target, then says **APPLY**.
 - **Reagent and ammo warnings**: in chat and mid-screen when you run low.
 - **Range icon**: is your target in range of your main attack (or a spell you pick)?
@@ -177,7 +177,7 @@ MIT, see [LICENSE](LICENSE).
 
 ### 1.5.5
 
-- **Cooldown ready flash.** When a spell with a cooldown over 7 seconds comes back (so not Arcane Shot), its icon pops up in the middle of the screen for about 3 seconds, then fades. Switch in `/ctk` or `/ctk pulse`; unlock the icons to move it.
+- **Cooldown ready flash.** When a spell with a cooldown over 7 seconds comes back (so not Arcane Shot), its icon pops up in the middle of the screen for about 5 seconds, then fades. Switch in `/ctk` or `/ctk pulse`; unlock the icons to move it.
 
 ### 1.5.4
 
