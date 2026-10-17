@@ -4,7 +4,8 @@
 local CTK = ClassToolkit
 
 local GOLD, GREY, WHITE, END = "|cffffd100", "|cff9d9d9d", "|cffffffff", "|r"
-local WIDTH, HEIGHT = 340, 510
+local WIDTH, HEIGHT = 520, 510
+local COLUMN = 250   -- the switches sit in two columns this far apart
 local MAX_LINES = 12   -- more than this and the window would run off the screen
 local ROW = 26
 
@@ -37,7 +38,7 @@ local TIPS = {
     "Red: out of range.", "READY: cast it.", "DoTs: purple countdown, then APPLY.",
     "Shown in combat or with an enemy targeted." },
   readyOne = { "One icon instead of a row.", "Shows the spell ready now, or back soonest." },
-  pulse = { "A spell's icon flashes mid-screen when its cooldown ends.", "Spells with a cooldown over 7 seconds. Unlock icons to move it." },
+  pulse = { "A spell's icon counts 5 to 1 mid-screen before its cooldown ends.", "Spells with a cooldown over 7 seconds. Unlock icons to move it." },
   buffs = { "An icon when a class buff is missing or running out.", "Click: cast it.",
     "Right-click: stop that reminder." },
   reagents = { "A warning when a reagent runs low.", "Hunters: ammo at 200 and 50 shots." },
@@ -50,6 +51,16 @@ local TIPS = {
   eatWarn = { "Shows while your pet eats.", "Don't attack: it cancels the meal.", "Goes away when the meal is done." },
   ammoBox = { "A red box when your equipped ammo is low.", "100 shots to start. /ctk ammo 50 changes it.",
     "Also shows when a bow or gun has no ammo equipped." },
+  interrupt = { "Your target starts a cast: a big CASTING icon, a flash and a sound.",
+    "Counts down the cast. Shows your interrupt or stun and if it is ready.", "Goes away when the cast ends." },
+  runner = { "A mob you fight runs away in fear: a big red RUNNER!", "Shows the spell to stop it with." },
+  tick = { "A thin bar counting down to your next mana or energy tick (every 2 seconds).",
+    "Purple after you spend mana: the 5 second rule.", "Hidden when you are full and out of combat." },
+  drink = { "After a fight: Drink and Eat icons when you are low.", "Click one to use your best drink or food.",
+    "40% to start. /ctk drink 30 changes it." },
+  trap = { "A bar counting down your Freezing Trap on a mob.", "Learns your real trap length as it goes." },
+  petHealth = { "A flashing icon when your pet is low on health.", "Click: Mend Pet (hunter) or Health Funnel (warlock).",
+    "35% to start. /ctk pethealth 50 changes it." },
 }
 
 -- One line per watched spell, made as they're added, so you can watch as many as you like.
@@ -208,21 +219,27 @@ function CTK.RefreshOptions()
   local class = CTK.Class()
   classText:SetText(GREY .. "What shows on this " .. (class and string.lower(class) or "character") .. END)
 
-  -- Switches that don't apply to this class are left out, and the rest close up.
-  local y = -64
+  -- Switches that don't apply to this class are left out, and the rest close up in two columns,
+  -- the left one filled first.
+  local fits = {}
   for i = 1, table.getn(checks) do
-    local check = checks[i]
-    local t = check.toggle
-    if not t.class or t.class == class then
-      check:ClearAllPoints()
-      check:SetPoint("TOPLEFT", frame, "TOPLEFT", 20, y)
-      check:SetChecked(CTK.char[t.key])
-      check:Show()
-      y = y - ROW
+    if CTK.ToggleFits(checks[i].toggle, class) then
+      table.insert(fits, checks[i])
     else
-      check:Hide()
+      checks[i]:Hide()
     end
   end
+  local perCol = math.ceil(table.getn(fits) / 2)
+  for i = 1, table.getn(fits) do
+    local check = fits[i]
+    local col = (i > perCol) and 1 or 0
+    local place = i - col * perCol - 1
+    check:ClearAllPoints()
+    check:SetPoint("TOPLEFT", frame, "TOPLEFT", 20 + col * COLUMN, -64 - place * ROW)
+    check:SetChecked(CTK.char[check.toggle.key])
+    check:Show()
+  end
+  local y = -64 - perCol * ROW
 
   -- The range icon's spell sits right under the switches.
   y = y - 4

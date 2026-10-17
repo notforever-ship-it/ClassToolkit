@@ -7,7 +7,7 @@
 ClassToolkit = {}
 local CTK = ClassToolkit
 
-CTK.VERSION = "1.5.8"
+CTK.VERSION = "1.6.0"
 CTK.movingIcons = false
 CTK.modules = {}   -- each module registers { update = function() } so settings changes reach it
 
@@ -89,7 +89,7 @@ local function ClassDefaults(class)
     swingMelee = not CASTERS[class],
     swingRanged = hunter or CASTERS[class] or false,  -- Auto Shot, or a wand's Shoot
     ready = true,
-    pulse = true,         -- a spell's icon flashes mid-screen when its cooldown ends
+    pulse = true,         -- a 5-to-1 countdown on a spell's icon mid-screen before its cooldown ends
     readyOne = false,   -- one icon showing the next spell ready, instead of one icon each
     watched = hunter and { "Arcane Shot" } or {},
     dotTimes = {},      -- [spell] = seconds you set with /ctk dot; 0 switches a DoT timer off
@@ -107,6 +107,14 @@ local function ClassDefaults(class)
     ammoBoxShots = 100,
     feedWhen = "content",
     feedSound = true,
+    interrupt = true,     -- "CASTING" alert when your target starts a cast, with your interrupt or stun
+    tick = class ~= "WARRIOR",   -- mana / energy tick bar; rage doesn't tick
+    trap = hunter,        -- Freezing Trap countdown
+    runner = true,        -- "RUNNER!" when a mob you fight runs away in fear
+    petHealth = hunter or class == "WARLOCK",
+    petHealthPct = 35,
+    drink = true,         -- eat / drink icons after a fight
+    drinkPct = 40,
     debug = false,
   }
 end
@@ -156,7 +164,7 @@ CTK.TOGGLES = {
   { key = "swingRanged", command = "ranged", label = "Auto Shot / wand timer" },
   { key = "ready", command = "ready", label = "Spell ready icons" },
   { key = "readyOne", command = "one", label = "Ready icons: just the next one" },
-  { key = "pulse", command = "pulse", label = "Cooldown ready flash" },
+  { key = "pulse", command = "pulse", label = "Cooldown countdown" },
   { key = "buffs", command = "buffs", label = "Buff reminder" },
   { key = "reagents", command = "reagents", label = "Reagent and ammo warnings" },
   { key = "range", command = "range", label = "Range icon" },
@@ -164,7 +172,23 @@ CTK.TOGGLES = {
   { key = "feed", command = "feed", label = "Pet feed reminder", class = "HUNTER" },
   { key = "eatWarn", command = "eating", label = "Pet eating warning", class = "HUNTER" },
   { key = "ammoBox", command = "ammo", label = "Low ammo box", class = "HUNTER" },
+  { key = "interrupt", command = "interrupt", label = "Interrupt alert" },
+  { key = "runner", command = "runner", label = "Runner alert" },
+  { key = "tick", command = "tick", label = "Mana / energy tick bar",
+    classes = { HUNTER = true, ROGUE = true, DRUID = true, PRIEST = true, MAGE = true, WARLOCK = true,
+      SHAMAN = true, PALADIN = true }, who = "not warriors" },
+  { key = "drink", command = "drink", label = "Eat / drink reminder" },
+  { key = "trap", command = "trap", label = "Freezing Trap timer", class = "HUNTER" },
+  { key = "petHealth", command = "pethealth", label = "Pet low health flash",
+    classes = { HUNTER = true, WARLOCK = true }, who = "hunters, warlocks" },
 }
+
+-- Does this switch apply to this class? Some are for one class, some for a few.
+function CTK.ToggleFits(t, class)
+  if t.classes then return t.classes[class or ""] and true or false end
+  if t.class then return t.class == class end
+  return true
+end
 
 function CTK.Toggle(key)
   CTK.char[key] = not CTK.char[key]
@@ -237,8 +261,9 @@ local function ChatHelp()
   CTK.Print("/ctk move - unlock or lock the icons for dragging")
   for i = 1, table.getn(CTK.TOGGLES) do
     local t = CTK.TOGGLES[i]
+    local who = t.who or (t.class and "hunters")
     CTK.Print("/ctk " .. t.command .. " - " .. string.lower(t.label) .. " on or off" ..
-      (t.class and " (hunters)" or ""))
+      (who and (" (" .. who .. ")") or ""))
   end
   CTK.Print("/ctk range <spell> - spell the range icon watches")
   CTK.Print("/ctk watch <spell> - add a spell ready icon")
@@ -252,6 +277,8 @@ local function ChatHelp()
   CTK.Print("/ctk feed sound - feed reminder sound on or off")
   CTK.Print("/ctk ammo <shots> - low ammo box level (100 to start)")
   CTK.Print("/ctk ammodebug - what the game says about your ammo slot")
+  CTK.Print("/ctk pethealth <percent> - pet low health flash level (35 to start)")
+  CTK.Print("/ctk drink <percent> - eat / drink reminder level (40 to start)")
   CTK.Print("/ctk buffs reset - bring back hidden buff reminders")
   CTK.Print("/ctk counts - list your reagents and ammo")
   CTK.Print("/ctk version - show your version")
@@ -281,6 +308,20 @@ local function SlashHandler(msg)
     CTK.char.ammoBoxShots = shots
     CTK.char.ammoBox = true
     CTK.Print("the low ammo box shows when the ammo you have equipped is down to " .. shots .. " shots.")
+    CTK.UpdateAll()
+    return
+  elseif cmd == "pethealth" and tonumber(rest) then
+    local pct = math.max(5, math.min(95, math.floor(tonumber(rest))))
+    CTK.char.petHealthPct = pct
+    CTK.char.petHealth = true
+    CTK.Print("the pet low health flash shows when your pet is under " .. pct .. "% health.")
+    CTK.UpdateAll()
+    return
+  elseif cmd == "drink" and tonumber(rest) then
+    local pct = math.max(5, math.min(89, math.floor(tonumber(rest))))
+    CTK.char.drinkPct = pct
+    CTK.char.drink = true
+    CTK.Print("after a fight, the eat / drink icons show under " .. pct .. "% health or mana.")
     CTK.UpdateAll()
     return
   elseif cmd == "ready" and (rest == "one" or rest == "all") then
@@ -377,7 +418,8 @@ loader:SetScript("OnEvent", function()
 
     -- Modules build their frames now; they stay hidden until the character is in the world.
     if CTK.InitWidgets then CTK.InitWidgets() end
-    local inits = { "InitSpells", "InitDots", "InitSwing", "InitReady", "InitPulse", "InitBuffs", "InitReagents", "InitRange", "InitAggro", "InitHunter" }
+    local inits = { "InitSpells", "InitDots", "InitSwing", "InitReady", "InitPulse", "InitBuffs", "InitReagents", "InitRange", "InitAggro", "InitHunter",
+      "InitInterrupt", "InitRunner", "InitTick", "InitTrap", "InitPetHealth", "InitEatDrink" }
     for i = 1, table.getn(inits) do
       local init = CTK[inits[i]]
       if init then

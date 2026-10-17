@@ -193,6 +193,66 @@ function CTK.SpellInRange(name)
   return nil
 end
 
+-- How a spell stands right now: "ready", "cooldown" (and the seconds left), "range" (target too far) or
+-- "unusable" (wrong stance or form, or not enough mana, rage or energy). Range and "unusable" need the
+-- spell on an action bar; without it only the cooldown is known. The global cooldown counts as ready.
+function CTK.SpellReadiness(name)
+  local left, duration = CTK.SpellCooldown(name)
+  if left > 0 and duration > 1.6 then return "cooldown", left end
+  local slot = CTK.ActionSlotFor(name)
+  if slot then
+    if not IsUsableAction(slot) then return "unusable", 0 end
+    if CTK.HasAttackableTarget() and IsActionInRange(slot) == 0 then return "range", 0 end
+  end
+  return "ready", 0
+end
+
+-- A pet spell's place in the pet's spellbook (a Felhunter's Spell Lock), or nil.
+local function PetSpellIndex(name)
+  if not UnitExists("pet") or UnitIsDead("pet") then return nil end
+  local i = 1
+  while i < 100 do
+    local n = GetSpellName(i, "pet")
+    if not n then return nil end
+    if n == name then return i end
+    i = i + 1
+  end
+  return nil
+end
+
+-- Out of a list of spells (best first), the one to use now: the first you know that is ready, else the
+-- one you know that is back soonest. Entries are spell names, or { pet = "Spell Lock" } for a pet spell.
+-- Gives back name, state (as SpellReadiness), seconds left and icon; nil if you know none of them.
+function CTK.BestAnswer(list)
+  local best, bestState, bestLeft, bestTexture
+  for i = 1, table.getn(list) do
+    local entry = list[i]
+    local name, state, left, texture
+    if type(entry) == "table" then
+      local index = PetSpellIndex(entry.pet)
+      if index then
+        name = entry.pet
+        texture = GetSpellTexture(index, "pet")
+        local start, duration = GetSpellCooldown(index, "pet")
+        left = (start and start > 0 and duration) and (start + duration - GetTime()) or 0
+        if left > 0 and duration > 1.6 then state = "cooldown" else state, left = "ready", 0 end
+      end
+    elseif CTK.KnowsSpell(entry) then
+      name = CTK.KnownSpellName(entry)
+      texture = CTK.SpellTexture(name)
+      state, left = CTK.SpellReadiness(name)
+    end
+    if name then
+      if state == "ready" then return name, state, left, texture end
+      -- Not ready: keep the one that is back soonest (out of range or unusable counts as soon).
+      if not best or left < bestLeft then
+        best, bestState, bestLeft, bestTexture = name, state, left, texture
+      end
+    end
+  end
+  return best, bestState, bestLeft, bestTexture
+end
+
 function CTK.InitSpells()
   local f = CreateFrame("Frame")
   local events = { "SPELLS_CHANGED", "LEARNED_SPELL_IN_TAB", "PLAYER_ENTERING_WORLD", "ACTIONBAR_SLOT_CHANGED" }

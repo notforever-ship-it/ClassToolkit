@@ -36,7 +36,7 @@ local HELP_LEFT = table.concat({
   "- " .. B("Ready icons: just the next one") .. ": one icon for the next spell ready.",
   "- " .. GREY .. "Grey + number" .. END .. ": cooling down.   " .. BLUE .. "Blue" .. END .. ": not enough mana, rage or energy.",
   "- " .. RED .. "Red" .. END .. ": out of range.   " .. GREEN .. "READY" .. END .. ": go.",
-  "- " .. B("Cooldown ready flash") .. ": a spell's icon pops up mid-screen when it is back.",
+  "- " .. B("Cooldown countdown") .. ": a spell's icon counts 5 to 1 mid-screen before it is back.",
   " ",
   GOLD .. "DoTs" .. END .. " (damage over time, like Corruption or Serpent Sting)",
   "- Counts down in " .. PURPLE .. "purple" .. END .. " while it ticks on your target.",
@@ -44,6 +44,14 @@ local HELP_LEFT = table.concat({
   "- Only your current target counts. The icon follows when you switch.",
   "- " .. B("/ctk dot") .. ": the lengths it read from the spell tooltips.",
   "- " .. B("/ctk dot Rend 12") .. " fixes one. Use " .. B("off") .. " or " .. B("auto") .. " in place of the number.",
+  " ",
+  GOLD .. "Fight alerts" .. END,
+  "- " .. RED .. "CASTING" .. END .. ": your target starts a cast. Counts it down, with a flash and a sound.",
+  "- Next to it: your interrupt or stun. " .. GREEN .. "READY" .. END .. ", a number, " .. RED .. "too far" .. END ..
+    " or " .. BLUE .. "can't now" .. END .. ".",
+  "- " .. RED .. "RUNNER!" .. END .. ": a mob runs away in fear. Shows the spell to stop it.",
+  "- " .. B("Tick bar") .. ": counts to your next mana or energy tick (every 2 sec).",
+  "- " .. PURPLE .. "Purple" .. END .. " after you spend mana: the 5 second rule.",
 }, "\n")
 
 local HELP_RIGHT = table.concat({
@@ -73,6 +81,14 @@ local HELP_RIGHT = table.concat({
   "- " .. B("/ctk aggro growl 170") .. " sets Growl.   " .. B("/ctk aggro reset") .. " forgets.",
   "- " .. B("Feed reminder") .. ": a face when your pet is not happy. Click it, then a food.",
   "- " .. B("Eating warning") .. ": " .. YELLOW .. "Pet is eating: don't attack" .. END .. ". Attacking ends the meal.",
+  "- " .. B("Freezing Trap timer") .. ": a bar counts down a frozen mob.",
+  "- " .. B("Pet low health") .. ": a flashing icon under 35%. Click: Mend Pet.",
+  "- " .. B("/ctk pethealth 50") .. " changes it. Warlocks get it too (Health Funnel).",
+  " ",
+  GOLD .. "After a fight" .. END,
+  "- " .. B("Drink") .. " and " .. B("Eat") .. " icons when you are under 40% mana or health.",
+  "- Click one to use your best drink or food. " .. B("/ctk drink 30") .. " changes the level.",
+  "- They go while you eat or drink, and once you are back above 90%.",
   " ",
   GOLD .. "Commands" .. END,
   "- " .. B("/ctk help") .. ": this window.",

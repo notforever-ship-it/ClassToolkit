@@ -10,11 +10,16 @@ Small helpers for every class on Ravencraft and other 1.12.1 servers.
 - **Swing timer**: bars count down to your next swing, Auto Shot or wand shot.
 - **Buff reminder**: an icon when a class buff is missing or running out. Click it to cast.
 - **Spell ready icons**: one icon per spell you watch. Shows cooldown, mana, range and **READY**.
-- **Cooldown ready flash**: a spell's icon pops up mid-screen for about 5 seconds when its cooldown ends.
+- **Cooldown countdown**: 5 seconds before a long cooldown ends, its icon counts 5 to 1 mid-screen.
 - **DoT timers**: a watched DoT counts down on your target, then says **APPLY**.
 - **Reagent and ammo warnings**: in chat and mid-screen when you run low.
 - **Range icon**: is your target in range of your main attack (or a spell you pick)?
-- **Hunters**: aggro meter, low ammo box, pet feed reminder, pet eating warning.
+- **Interrupt alert**: a big **CASTING** icon when your target starts a cast, with your interrupt and if it is ready.
+- **Runner alert**: a big red **RUNNER!** when a mob runs away in fear, with the spell to stop it.
+- **Tick bar**: counts down to your next mana or energy tick, and shows the 5 second rule.
+- **Eat / drink reminder**: after a fight, click to use your best food or drink.
+- **Hunters**: aggro meter, low ammo box, pet feed reminder, pet eating warning, Freezing Trap timer.
+- **Hunters and warlocks**: a flashing pet low health icon. Click it to heal the pet.
 
 These started in [PokeHuntLog](https://github.com/notforever-ship-it/PokeHuntLog) and moved here for every class.
 
@@ -69,7 +74,7 @@ These started in [PokeHuntLog](https://github.com/notforever-ship-it/PokeHuntLog
 - Red: out of range.
 - **READY**: cast it.
 - **Ready icons: just the next one**: one icon for the next spell ready.
-- **Cooldown ready flash**: any spell's icon pops up mid-screen when its cooldown ends (on by default; unlock icons to move it).
+- **Cooldown countdown**: a spell's icon counts 5 to 1 mid-screen before its cooldown ends (on by default; unlock icons to move it).
 - Hunters start with Arcane Shot.
 
 ## DoT timers
@@ -98,8 +103,37 @@ These started in [PokeHuntLog](https://github.com/notforever-ship-it/PokeHuntLog
 - Hunters: **Dead zone** when neither shot nor Wing Clip lands.
 - Hunters get a plain bow picture.
 
+## Interrupt alert
+
+- Your target starts a cast: a big icon says **CASTING: <spell>**, with a flash and a sound.
+- It counts the cast down. A **~** in front means the time is a guess (3 seconds) until it has seen that spell.
+- Next to it: your interrupt or stun. **READY**, a number (cooldown), **too far** or **can't now**.
+- Goes away when the cast ends, is interrupted, or you change target.
+- With SuperWoW the real cast time is used.
+
+## Runner alert
+
+- A mob you fight runs away in fear: a big red **RUNNER!** for 3 seconds, with a sound.
+- Shows the mob's name and your best spell to stop it (hunters: Concussive Shot, then Wing Clip).
+
+## Tick bar
+
+- A thin bar counts down to your next mana or energy tick (every 2 seconds).
+- **Purple** after you spend mana: the 5 second rule. Spirit regen starts again when it is full.
+- Hidden when you are full and out of combat. Not for rage.
+
+## Eat / drink reminder
+
+- After a fight: a **Drink** icon under 40% mana, an **Eat** icon under 40% health.
+- Click one to use your best drink or food (the one that restores the most and fits your level).
+- They go while you eat or drink, once you are back above 90%, or when a fight starts.
+- `/ctk drink <percent>` changes the level.
+
 ## Hunters
 
+- **Freezing Trap timer**: a bar counts down a frozen mob. It learns your trap's real length.
+- **Pet low health**: a flashing icon when your pet is under 35% health. Click it for Mend Pet.
+- `/ctk pethealth <percent>` changes the level. Warlocks get it too, with Health Funnel.
 - **Aggro meter**: how close you are to pulling the mob off your pet.
 - It shows who the mob attacks, and says Shoot, Ease off, Hold or Feign Death.
 - It learns your server's Growl as you fight.
@@ -115,6 +149,10 @@ These started in [PokeHuntLog](https://github.com/notforever-ship-it/PokeHuntLog
 | Priest, Mage, Warlock | | wand | yes | add your own | yes | yes | |
 | Hunter | yes | Auto Shot | yes | Arcane Shot | yes + ammo, low ammo box | yes | yes |
 
+- Every class: interrupt alert, runner alert, eat / drink reminder, cooldown ready flash.
+- Tick bar: every class but warriors.
+- Freezing Trap timer: hunters. Pet low health flash: hunters and warlocks.
+
 ## Commands
 
 | Command | What it does |
@@ -125,9 +163,14 @@ These started in [PokeHuntLog](https://github.com/notforever-ship-it/PokeHuntLog
 | `/ctk move` (or `lock`, `unlock`) | Unlock or lock the icons for dragging |
 | `/ctk swing`, `/ctk ranged` | Melee timer, Auto Shot / wand timer on or off |
 | `/ctk ready`, `/ctk one` | Spell ready icons, just the next one, on or off |
-| `/ctk pulse` | Cooldown ready flash on or off |
+| `/ctk pulse` | Cooldown countdown on or off |
 | `/ctk buffs`, `/ctk reagents`, `/ctk range` | Buff reminder, reagent warnings, range icon on or off |
 | `/ctk aggro`, `/ctk feed`, `/ctk eating`, `/ctk ammo` | Hunters: aggro meter, feed reminder, eating warning, low ammo box on or off |
+| `/ctk interrupt`, `/ctk runner`, `/ctk tick`, `/ctk drink` | Interrupt alert, runner alert, tick bar, eat / drink reminder on or off |
+| `/ctk trap` | Hunters: Freezing Trap timer on or off |
+| `/ctk pethealth` | Hunters and warlocks: pet low health flash on or off |
+| `/ctk pethealth <percent>` | Pet low health flash level (35 to start) |
+| `/ctk drink <percent>` | Eat / drink reminder level (40 to start) |
 | `/ctk range <spell>` | Spell the range icon watches |
 | `/ctk watch <spell>` | Add a spell ready icon |
 | `/ctk unwatch <spell>` | Remove one |
@@ -151,6 +194,7 @@ These started in [PokeHuntLog](https://github.com/notforever-ship-it/PokeHuntLog
 - **Swings**: SuperWoW reports every swing. Without it, the combat log is read.
 - **Buffs**: names are read from each buff's tooltip.
 - **Reagents**: only watched once you have carried the warning amount.
+- **Casts, runners, traps**: read from the combat log. SuperWoW adds real cast times.
 - The combat log parts only work on English game clients.
 
 ## Reporting bugs
@@ -175,9 +219,21 @@ MIT, see [LICENSE](LICENSE).
 
 ## Changelog
 
+### 1.6.0
+
+- **Interrupt alert**: a big CASTING icon when your target starts a cast, with a countdown, a flash, a sound, and your interrupt or stun.
+- **Runner alert**: a big red RUNNER! when a mob runs away in fear, with the spell to stop it.
+- **Tick bar**: counts down to your next mana or energy tick; purple for the 5 second rule.
+- **Eat / drink reminder**: after a fight, click to use your best food or drink.
+- **Freezing Trap timer** for hunters.
+- **Pet low health flash** for hunters (Mend Pet) and warlocks (Health Funnel).
+- **Cooldown countdown** (was the cooldown ready flash): the icon shows 5 seconds early and counts 5 to 1.
+- The options window now has two columns of switches.
+- New files: close the game completely and start it again after updating.
+
 ### 1.5.5
 
-- **Cooldown ready flash.** When a spell with a cooldown over 7 seconds comes back (so not Arcane Shot), its icon pops up in the middle of the screen for about 5 seconds, then fades. Switch in `/ctk` or `/ctk pulse`; unlock the icons to move it.
+- **Cooldown countdown.** 5 seconds before a spell with a cooldown over 7 seconds comes back (so not Arcane Shot), its icon shows in the middle of the screen counting 5, 4, 3, 2, 1, then fades as it is ready. Switch in `/ctk` or `/ctk pulse`; unlock the icons to move it.
 
 ### 1.5.4
 

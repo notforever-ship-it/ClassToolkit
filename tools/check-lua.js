@@ -31,7 +31,7 @@ const KNOWN_GLOBALS = new Set((
   "UnitPlayerControlled UnitIsDead UnitClassification HasPetUI GetStablePetInfo GetPetLoyalty " +
   "GetRealmName GetZoneText GetRealZoneText GetTime UnitAffectingCombat " +
   // SuperWoW
-  "UNKNOWNOBJECT PetRename " +
+  "UNKNOWNOBJECT PetRename SpellInfo " +
   "HasAction IsActionInRange GetActionTexture CheckInteractDistance UnitCanAttack GetPetHappiness UnitBuff " +
   "CastSpellByName WorldFrame " +
   "seterrorhandler geterrorhandler _ERRORMESSAGE debugstack GetNumAddOns GetAddOnInfo GetAddOnMetadata GetBuildInfo " +
@@ -40,7 +40,8 @@ const KNOWN_GLOBALS = new Set((
   "GetPetTrainingPoints GetNumTrainerServices GetTrainerServiceInfo GetTrainerServiceLevelReq " +
   "GetContainerItemInfo GetContainerItemLink GetContainerNumSlots GetPlayerBuff GetPlayerBuffTimeLeft " +
   "GetInventoryItemLink GetInventoryItemTexture UnitIsDeadOrGhost UnitOnTaxi GetPetExperience IsTradeskillTrainer UnitRangedDamage GetSpellCooldown GetSpellTexture UnitMana " +
-  "UnitDebuff BOOKTYPE_SPELL SUPERWOW_VERSION"
+  "UnitDebuff BOOKTYPE_SPELL SUPERWOW_VERSION " +
+  "IsUsableAction UnitHealth UnitPowerType UseContainerItem GetNumTalentTabs GetNumTalents GetTalentInfo"
 ).split(/\s+/).filter(Boolean));
 
 // Member calls that don't exist in Lua 5.0 / the 1.12 client.
