@@ -219,6 +219,10 @@ MIT, see [LICENSE](LICENSE).
 
 ## Changelog
 
+### 1.6.1
+
+- The cooldown countdown shows the spell name under the icon.
+
 ### 1.6.0
 
 - **Interrupt alert**: a big CASTING icon when your target starts a cast, with a countdown, a flash, a sound, and your interrupt or stun.

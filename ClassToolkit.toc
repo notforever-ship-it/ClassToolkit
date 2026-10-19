@@ -2,7 +2,7 @@
 ## Title: Class Toolkit
 ## Notes: Swing timer, range icon, buff and reagent reminders, spell ready icons, interrupt and runner alerts, tick bar, eat and drink reminder; aggro meter, trap timer and pet helpers for hunters. /ctk
 ## Author: stealthzi
-## Version: 1.6.0
+## Version: 1.6.1
 ## SavedVariables: ClassToolkitDB
 ## SavedVariablesPerCharacter: ClassToolkitCharDB
 

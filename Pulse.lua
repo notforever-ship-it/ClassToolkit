@@ -55,7 +55,7 @@ local function Show(name, now)
   shownAt = now
   readyAt = nil
   frame.icon:SetTexture(cooling[name].texture or QUESTION)
-  frame.label:SetText("")
+  frame.label:SetText(name)                 -- the spell name under the icon
   frame:SetAlpha(0)
   frame:Show()
 end
