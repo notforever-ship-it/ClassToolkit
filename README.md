@@ -18,6 +18,7 @@ Small helpers for every class on Ravencraft and other 1.12.1 servers.
 - **Runner alert**: a big red **RUNNER!** when a mob runs away in fear, with the spell to stop it.
 - **Tick bar**: counts down to your next mana or energy tick, and shows the 5 second rule.
 - **Eat / drink reminder**: after a fight, click to use your best food or drink.
+- **Sell all**: at a vendor, Ctrl+Right-click an item to sell every stack of it.
 - **Hunters**: aggro meter, low ammo box, pet feed reminder, pet eating warning, Freezing Trap timer.
 - **Hunters and warlocks**: a flashing pet low health icon. Click it to heal the pet.
 
@@ -129,6 +130,12 @@ These started in [PokeHuntLog](https://github.com/notforever-ship-it/PokeHuntLog
 - They go while you eat or drink, once you are back above 90%, or when a fight starts.
 - `/ctk drink <percent>` changes the level.
 
+## Sell all
+
+- At a vendor, **Ctrl+Right-click** an item in your bags: every stack of it is sold.
+- Its tooltip says so while the vendor window is open.
+- `/ctk sell` switches it on or off.
+
 ## Hunters
 
 - **Freezing Trap timer**: a bar counts down a frozen mob. It learns your trap's real length.
@@ -167,6 +174,7 @@ These started in [PokeHuntLog](https://github.com/notforever-ship-it/PokeHuntLog
 | `/ctk buffs`, `/ctk reagents`, `/ctk range` | Buff reminder, reagent warnings, range icon on or off |
 | `/ctk aggro`, `/ctk feed`, `/ctk eating`, `/ctk ammo` | Hunters: aggro meter, feed reminder, eating warning, low ammo box on or off |
 | `/ctk interrupt`, `/ctk runner`, `/ctk tick`, `/ctk drink` | Interrupt alert, runner alert, tick bar, eat / drink reminder on or off |
+| `/ctk sell` | Ctrl+Right-click sell all at vendors on or off |
 | `/ctk trap` | Hunters: Freezing Trap timer on or off |
 | `/ctk pethealth` | Hunters and warlocks: pet low health flash on or off |
 | `/ctk pethealth <percent>` | Pet low health flash level (35 to start) |
@@ -218,6 +226,11 @@ Made by stealthzi.
 MIT, see [LICENSE](LICENSE).
 
 ## Changelog
+
+### 1.7.0
+
+- **Sell all**: at a vendor, Ctrl+Right-click an item in your bags to sell every stack of it. The tooltip says so.
+- New file: close the game completely and start it again after updating.
 
 ### 1.6.1
 

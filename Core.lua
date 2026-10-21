@@ -7,7 +7,7 @@
 ClassToolkit = {}
 local CTK = ClassToolkit
 
-CTK.VERSION = "1.6.1"
+CTK.VERSION = "1.7.0"
 CTK.movingIcons = false
 CTK.modules = {}   -- each module registers { update = function() } so settings changes reach it
 
@@ -115,6 +115,7 @@ local function ClassDefaults(class)
     petHealthPct = 35,
     drink = true,         -- eat / drink icons after a fight
     drinkPct = 40,
+    sellAll = true,       -- Ctrl+Right-click a bag item at a vendor: sell every stack of it
     debug = false,
   }
 end
@@ -181,6 +182,7 @@ CTK.TOGGLES = {
   { key = "trap", command = "trap", label = "Freezing Trap timer", class = "HUNTER" },
   { key = "petHealth", command = "pethealth", label = "Pet low health flash",
     classes = { HUNTER = true, WARLOCK = true }, who = "hunters, warlocks" },
+  { key = "sellAll", command = "sell", label = "Ctrl+Right-click: sell all" },
 }
 
 -- Does this switch apply to this class? Some are for one class, some for a few.
@@ -419,7 +421,7 @@ loader:SetScript("OnEvent", function()
     -- Modules build their frames now; they stay hidden until the character is in the world.
     if CTK.InitWidgets then CTK.InitWidgets() end
     local inits = { "InitSpells", "InitDots", "InitSwing", "InitReady", "InitPulse", "InitBuffs", "InitReagents", "InitRange", "InitAggro", "InitHunter",
-      "InitInterrupt", "InitRunner", "InitTick", "InitTrap", "InitPetHealth", "InitEatDrink" }
+      "InitInterrupt", "InitRunner", "InitTick", "InitTrap", "InitPetHealth", "InitEatDrink", "InitSell" }
     for i = 1, table.getn(inits) do
       local init = CTK[inits[i]]
       if init then

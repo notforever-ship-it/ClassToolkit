@@ -61,6 +61,8 @@ local TIPS = {
   trap = { "A bar counting down your Freezing Trap on a mob.", "Learns your real trap length as it goes." },
   petHealth = { "A flashing icon when your pet is low on health.", "Click: Mend Pet (hunter) or Health Funnel (warlock).",
     "35% to start. /ctk pethealth 50 changes it." },
+  sellAll = { "At a vendor: Ctrl+Right-click an item in your bags.", "Sells every stack of that item.",
+    "Its tooltip says so while the vendor is open." },
 }
 
 -- One line per watched spell, made as they're added, so you can watch as many as you like.

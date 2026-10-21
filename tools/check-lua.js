@@ -31,7 +31,7 @@ const KNOWN_GLOBALS = new Set((
   "UnitPlayerControlled UnitIsDead UnitClassification HasPetUI GetStablePetInfo GetPetLoyalty " +
   "GetRealmName GetZoneText GetRealZoneText GetTime UnitAffectingCombat " +
   // SuperWoW
-  "UNKNOWNOBJECT PetRename SpellInfo " +
+  "UNKNOWNOBJECT PetRename SpellInfo MerchantFrame " +
   "HasAction IsActionInRange GetActionTexture CheckInteractDistance UnitCanAttack GetPetHappiness UnitBuff " +
   "CastSpellByName WorldFrame " +
   "seterrorhandler geterrorhandler _ERRORMESSAGE debugstack GetNumAddOns GetAddOnInfo GetAddOnMetadata GetBuildInfo " +
