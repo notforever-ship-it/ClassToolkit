@@ -14,6 +14,16 @@ local SIZE, PER_LINE, GAP = 32, 6, 36
 local QUESTION = "Interface\\Icons\\INV_Misc_QuestionMark"
 local row
 
+-- Spells that only work after you crit your target (Turtle WoW's Kill Command). The game says they are
+-- usable any time, so the addon keeps track itself: a crit by you on your target opens it, using the
+-- spell (its cooldown starting) or changing target closes it again.
+local critAt = 0        -- when you last crit your current target
+local usedAt = {}       -- [spell] = when its cooldown last started
+
+local function CritReady(name)
+  return critAt > (usedAt[name] or 0)
+end
+
 -- Show one icon as that spell stands right now.
 local function Paint(icon, name, power)
   icon.icon:SetTexture(CTK.SpellTexture(name) or QUESTION)
@@ -29,6 +39,9 @@ local function Paint(icon, name, power)
     elseif not ok then
       usable = false
     end
+  end
+  if usable ~= false and CTK.SpellNeedsCrit and CTK.SpellNeedsCrit(name) and not CritReady(name) then
+    usable = false
   end
   -- No target means range can't be judged, not that it's out of range.
   local inRange = nil
@@ -182,4 +195,35 @@ function CTK.InitReady()
   local driver = CreateFrame("Frame")
   driver:SetScript("OnUpdate", OnUpdate)
   CTK.RegisterModule({ update = Update })
+
+  -- Crits for the spells that need one ("You crit Boar for 120." / "Your Arcane Shot crits Boar for 300.").
+  local crits = CreateFrame("Frame")
+  crits:RegisterEvent("CHAT_MSG_COMBAT_SELF_HITS")
+  crits:RegisterEvent("CHAT_MSG_SPELL_SELF_DAMAGE")
+  crits:RegisterEvent("PLAYER_TARGET_CHANGED")
+  crits:RegisterEvent("SPELL_UPDATE_COOLDOWN")
+  crits:SetScript("OnEvent", function()
+    if event == "PLAYER_TARGET_CHANGED" then
+      critAt = 0
+    elseif event == "SPELL_UPDATE_COOLDOWN" then
+      -- A watched crit spell just used: it needs a new crit before it works again.
+      local watched = CTK.char and CTK.char.watched or {}
+      for i = 1, table.getn(watched) do
+        local name = watched[i]
+        if CTK.SpellNeedsCrit and CTK.SpellNeedsCrit(name) then
+          local index = CTK.SpellIndex(name)
+          local start, duration = GetSpellCooldown(index, "spell")
+          if start and start > 0 and duration and duration > 1.6 then usedAt[name] = start end
+        end
+      end
+    else
+      local msg = arg1 or ""
+      local target = UnitName("target")
+      if target and (string.find(msg, "^You crit ") or string.find(msg, " crits ", 1, true))
+        and string.find(msg, target, 1, true) then
+        critAt = GetTime()
+        CTK.Debug("crit on " .. target .. ": crit spells open")
+      end
+    end
+  end)
 end

@@ -36,7 +36,7 @@ local HELP_LEFT = table.concat({
   "- " .. B("Ready icons: just the next one") .. ": one icon for the next spell ready.",
   "- " .. GREY .. "Grey + number" .. END .. ": cooling down.   " .. BLUE .. "Blue" .. END .. ": not enough mana, rage or energy.",
   "- " .. RED .. "Red" .. END .. ": out of range.   " .. GREEN .. "READY" .. END .. ": go.",
-  "- " .. GREY .. "Grey not yet" .. END .. ": the game won't let you use it yet. Needs the spell on an action bar.",
+  "- " .. GREY .. "Grey not yet" .. END .. ": the game won't let you use it yet (or it needs a crit first).",
   "- " .. B("Cooldown countdown") .. ": a spell's icon counts 5 to 1 mid-screen before it is back.",
   "- Paladins: your seal counts down the same way as it runs out, so you know when to recast it.",
   " ",

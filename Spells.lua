@@ -13,6 +13,7 @@ local spells = {}          -- [lowercase name] = { name, index, texture }
 local costs = {}           -- [lowercase name] = number, read from the tooltip on first use
 local ranges = {}          -- [lowercase name] = yards (0 for melee), read from the tooltip on first use
 local dotTimes = {}        -- [lowercase name] = seconds a DoT ticks (false: not a DoT), from the tooltip
+local needsCrit = {}       -- [lowercase name] = true when the tooltip says it needs a critical strike first
 local actionSlots = {}     -- [lowercase name] = slot
 local slotNames = {}       -- [slot] = what the button's tooltip calls it
 local slotsDirty = true
@@ -23,6 +24,7 @@ local function ScanSpellbook()
   costs = {}
   ranges = {}
   dotTimes = {}
+  needsCrit = {}
   local i, noIcon = 1, 0
   while i < 500 do
     local name = GetSpellName(i, BOOK)
@@ -141,6 +143,31 @@ function CTK.SpellCost(name)
     tip:Hide()
   end
   return costs[key] or nil
+end
+
+-- Does the spell only work after you land a critical strike (Turtle WoW's Kill Command: "Can only be used
+-- after the Hunter lands a critical strike on the target")? The game itself doesn't know, so it is read
+-- from the tooltip once.
+function CTK.SpellNeedsCrit(name)
+  local key = name and string.lower(name)
+  if not key or not spells[key] then return false end
+  if needsCrit[key] == nil then
+    needsCrit[key] = false
+    local tip = CTK.ScanTooltip()
+    tip:SetSpell(spells[key].index, BOOK)
+    for line = 2, 10 do
+      local text = CTK.ScanLine("Left", line)
+      if text then
+        local lower = string.lower(text)
+        if string.find(lower, "only be used after", 1, true) and string.find(lower, "critical strike", 1, true) then
+          needsCrit[key] = true
+          break
+        end
+      end
+    end
+    tip:Hide()
+  end
+  return needsCrit[key]
 end
 
 -- How far the spell reaches: yards as the tooltip says ("30 yd range", talents included), 0 for

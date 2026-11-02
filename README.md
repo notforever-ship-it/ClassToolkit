@@ -229,6 +229,10 @@ MIT, see [LICENSE](LICENSE).
 
 ## Changelog
 
+### 1.7.4
+
+- Fix: Kill Command (and any spell that "can only be used after the Hunter lands a critical strike") showed **READY** all the time, because the game says it can be used any time. The addon now watches your crits: it turns **READY** after you crit your target, and goes back to **not yet** once you use it or change target.
+
 ### 1.7.3
 
 - Fix: a spell ready icon said READY for a spell the game would not let you use yet (like Kill Command). With the spell on an action bar it now says **not yet** in grey until you can really use it.
