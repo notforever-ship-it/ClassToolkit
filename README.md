@@ -73,6 +73,7 @@ These started in [PokeHuntLog](https://github.com/notforever-ship-it/PokeHuntLog
 - Grey with a number: cooling down.
 - Blue: not enough mana, rage or energy.
 - Red: out of range.
+- Grey **not yet**: the game won't let you use it yet (needs the spell on an action bar).
 - **READY**: cast it.
 - **Ready icons: just the next one**: one icon for the next spell ready.
 - **Cooldown countdown**: a spell's icon counts 5 to 1 mid-screen before its cooldown ends (on by default; unlock icons to move it).
@@ -227,6 +228,10 @@ Made by stealthzi.
 MIT, see [LICENSE](LICENSE).
 
 ## Changelog
+
+### 1.7.3
+
+- Fix: a spell ready icon said READY for a spell the game would not let you use yet (like Kill Command). With the spell on an action bar it now says **not yet** in grey until you can really use it.
 
 ### 1.7.2
 

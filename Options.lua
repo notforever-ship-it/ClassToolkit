@@ -35,7 +35,7 @@ local TIPS = {
   swingRanged = { "Counts down to your next Auto Shot or wand shot.",
     "Auto Shot: at the red end, stand still or the shot is delayed." },
   ready = { "An icon for each watched spell.", "Grey + number: cooling down.", "Blue: not enough mana.",
-    "Red: out of range.", "READY: cast it.", "DoTs: purple countdown, then APPLY.",
+    "Red: out of range.", "Grey not yet: can't be used yet.", "READY: cast it.", "DoTs: purple countdown, then APPLY.",
     "Shown in combat or with an enemy targeted." },
   readyOne = { "One icon instead of a row.", "Shows the spell ready now, or back soonest." },
   pulse = { "A spell's icon counts 5 to 1 mid-screen before its cooldown ends.", "Spells with a cooldown over 7 seconds. Unlock icons to move it.",

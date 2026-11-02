@@ -19,6 +19,17 @@ local function Paint(icon, name, power)
   icon.icon:SetTexture(CTK.SpellTexture(name) or QUESTION)
   local left, duration = CTK.SpellCooldown(name)
   local cost = CTK.SpellCost(name)
+  -- On an action bar the game can say if the spell can be used at all right now; READY only when it can.
+  local usable, noMana = nil, nil
+  local slot = CTK.ActionSlotFor(name)
+  if slot then
+    local ok, lowMana = IsUsableAction(slot)
+    if lowMana then
+      noMana = true
+    elseif not ok then
+      usable = false
+    end
+  end
   -- No target means range can't be judged, not that it's out of range.
   local inRange = nil
   if CTK.HasAttackableTarget() then inRange = CTK.SpellInRange(name) end
@@ -49,7 +60,12 @@ local function Paint(icon, name, power)
     -- The global cooldown shows too, but a countdown for it would only flicker.
     if duration > 1.6 then icon.count:SetText(tostring(math.ceil(left))) else icon.count:SetText("") end
     CTK.SetIconState(icon, 0.6, 0.6, 0.6, name)
-  elseif cost and power < cost then
+  elseif usable == false then
+    -- The game says it cannot be used yet (a spell that needs something to happen first, or the wrong stance).
+    icon.icon:SetVertexColor(0.4, 0.4, 0.4)
+    icon.count:SetText("")
+    CTK.SetIconState(icon, 0.6, 0.6, 0.6, "not yet")
+  elseif (cost and power < cost) or noMana then
     icon.icon:SetVertexColor(0.35, 0.35, 1)
     icon.count:SetText("")
     CTK.SetIconState(icon, 0.4, 0.5, 1, "not enough")
