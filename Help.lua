@@ -37,6 +37,7 @@ local HELP_LEFT = table.concat({
   "- " .. GREY .. "Grey + number" .. END .. ": cooling down.   " .. BLUE .. "Blue" .. END .. ": not enough mana, rage or energy.",
   "- " .. RED .. "Red" .. END .. ": out of range.   " .. GREEN .. "READY" .. END .. ": go.",
   "- " .. B("Cooldown countdown") .. ": a spell's icon counts 5 to 1 mid-screen before it is back.",
+  "- Paladins: your seal counts down the same way as it runs out, so you know when to recast it.",
   " ",
   GOLD .. "DoTs" .. END .. " (damage over time, like Corruption or Serpent Sting)",
   "- Counts down in " .. PURPLE .. "purple" .. END .. " while it ticks on your target.",

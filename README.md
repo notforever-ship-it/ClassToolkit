@@ -76,6 +76,7 @@ These started in [PokeHuntLog](https://github.com/notforever-ship-it/PokeHuntLog
 - **READY**: cast it.
 - **Ready icons: just the next one**: one icon for the next spell ready.
 - **Cooldown countdown**: a spell's icon counts 5 to 1 mid-screen before its cooldown ends (on by default; unlock icons to move it).
+- Paladins: your seal counts down the same way as it runs out, so you know when to recast it.
 - Hunters start with Arcane Shot.
 
 ## DoT timers
@@ -226,6 +227,10 @@ Made by stealthzi.
 MIT, see [LICENSE](LICENSE).
 
 ## Changelog
+
+### 1.7.1
+
+- Paladins: the cooldown countdown also counts your seal down (5 to 1) as it runs out, so you know when to recast it.
 
 ### 1.7.0
 

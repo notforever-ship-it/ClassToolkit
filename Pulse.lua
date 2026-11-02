@@ -1,6 +1,8 @@
 -- Class Toolkit: cooldown countdown. 5 seconds before a spell with a long cooldown (over 7 seconds, so not
 -- Arcane Shot) comes back, its icon shows in the middle of the screen with a big 5, 4, 3, 2, 1, then fades
 -- away as it is ready. Several at once: the one back soonest shows first. Unlock the icons to move it.
+-- Paladins: the seal on you counts down the same way as it runs out (a seal only lasts about 30 seconds), so
+-- you know when to put it back up.
 
 local CTK = ClassToolkit
 
@@ -12,7 +14,7 @@ local QUESTION = "Interface\\Icons\\INV_Misc_QuestionMark"
 local BOOK = "spell"
 
 local frame
-local cooling = {}     -- [spell name] = { texture, ends }
+local cooling = {}     -- [spell name] = { texture, ends }; a paladin's seal buff sits in here too (seal = true)
 local showing          -- the spell name counting down right now
 local shownAt, readyAt
 
@@ -36,6 +38,30 @@ local function Scan()
       cooling[name] = nil      -- reset early (e.g. Readiness): it is back already
     end
     i = i + 1
+  end
+end
+
+-- Paladins: note the seal that is on you and when it runs out, read from the buff's tooltip (1.12 only
+-- hands addons the buff icons). Judging uses the seal up, so a seal that is gone is dropped again.
+local function ScanSeal()
+  if not CTK.IsClass("PALADIN") then return end
+  for name, entry in pairs(cooling) do
+    if entry.seal then cooling[name] = nil end
+  end
+  local tip = CTK.ScanTooltip()
+  for i = 0, 31 do
+    local index, untilCancelled = GetPlayerBuff(i, "HELPFUL")
+    if not index or index < 0 then break end
+    tip:SetOwner(WorldFrame, "ANCHOR_NONE")
+    tip:SetPlayerBuff(index)
+    local name = CTK.ScanLine("Left", 1)
+    tip:Hide()
+    if name and untilCancelled ~= 1 and string.find(name, "^Seal of ") then
+      local left = GetPlayerBuffTimeLeft(index)
+      if left and left > 0 then
+        cooling[name] = { texture = GetPlayerBuffTexture(index), ends = GetTime() + left, seal = true }
+      end
+    end
   end
 end
 
@@ -96,9 +122,14 @@ local function OnUpdate()
     return
   end
   local left = entry.ends - now
+  if left > LEAD then
+    showing = nil           -- put back up (a seal recast) or pushed back: wait for the last 5 seconds again
+    frame:Hide()
+    return
+  end
   if left <= 0 then
     -- Make sure it really is back, not pushed back or started again.
-    local real = CTK.SpellCooldown(showing)
+    local real = entry.seal and 0 or CTK.SpellCooldown(showing)
     if real > 0.2 then
       entry.ends = now + real
       if real > LEAD then
@@ -147,7 +178,10 @@ function CTK.InitPulse()
   local driver = CreateFrame("Frame")
   driver:RegisterEvent("SPELL_UPDATE_COOLDOWN")
   driver:RegisterEvent("PLAYER_ENTERING_WORLD")
-  driver:SetScript("OnEvent", Scan)
+  driver:RegisterEvent("PLAYER_AURAS_CHANGED")
+  driver:SetScript("OnEvent", function()
+    if event == "PLAYER_AURAS_CHANGED" then ScanSeal() else Scan() ScanSeal() end
+  end)
   driver:SetScript("OnUpdate", OnUpdate)
   CTK.RegisterModule({ update = Update })
 end
