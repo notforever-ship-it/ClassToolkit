@@ -17,6 +17,7 @@ local frame
 local cooling = {}     -- [spell name] = { texture, ends }; a paladin's seal buff sits in here too (seal = true)
 local showing          -- the spell name counting down right now
 local shownAt, readyAt
+local nextSealScan = 0 -- paladins: the seal is re-read every second (a recast does not always fire an event)
 
 -- Note every spell that is on a long cooldown right now, and when it comes back.
 local function Scan()
@@ -96,6 +97,12 @@ local function OnUpdate()
       frame:Hide()
     end
     return
+  end
+
+  -- Paladins: re-read the seal once a second, so a recast resets the countdown even when no buff event comes.
+  if now >= nextSealScan then
+    nextSealScan = now + 1
+    ScanSeal()
   end
 
   -- Ready: the icon fades away, then the next one in line can show.

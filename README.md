@@ -228,6 +228,10 @@ MIT, see [LICENSE](LICENSE).
 
 ## Changelog
 
+### 1.7.2
+
+- Fix: the seal countdown kept counting after a recast and then forgot the seal; it now re-checks the seal every second.
+
 ### 1.7.1
 
 - Paladins: the cooldown countdown also counts your seal down (5 to 1) as it runs out, so you know when to recast it.

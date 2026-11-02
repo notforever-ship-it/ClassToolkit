@@ -7,7 +7,7 @@
 ClassToolkit = {}
 local CTK = ClassToolkit
 
-CTK.VERSION = "1.7.1"
+CTK.VERSION = "1.7.2"
 CTK.movingIcons = false
 CTK.modules = {}   -- each module registers { update = function() } so settings changes reach it
 
