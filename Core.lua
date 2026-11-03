@@ -7,7 +7,7 @@
 ClassToolkit = {}
 local CTK = ClassToolkit
 
-CTK.VERSION = "1.7.4"
+CTK.VERSION = "1.7.5"
 CTK.movingIcons = false
 CTK.modules = {}   -- each module registers { update = function() } so settings changes reach it
 
@@ -92,6 +92,8 @@ local function ClassDefaults(class)
     pulse = true,         -- a 5-to-1 countdown on a spell's icon mid-screen before its cooldown ends
     readyOne = false,   -- one icon showing the next spell ready, instead of one icon each
     watched = hunter and { "Arcane Shot" } or {},
+    bigReady = true,      -- a big READY icon you can move, for the spells you pick, until you use them
+    bigWatched = hunter and { "Kill Command" } or {},
     dotTimes = {},      -- [spell] = seconds you set with /ctk dot; 0 switches a DoT timer off
     buffs = true,
     buffWarnSeconds = 60,
@@ -166,6 +168,7 @@ CTK.TOGGLES = {
   { key = "ready", command = "ready", label = "Spell ready icons" },
   { key = "readyOne", command = "one", label = "Ready icons: just the next one" },
   { key = "pulse", command = "pulse", label = "Cooldown countdown" },
+  { key = "bigReady", command = "big", label = "Big READY alert" },
   { key = "buffs", command = "buffs", label = "Buff reminder" },
   { key = "reagents", command = "reagents", label = "Reagent and ammo warnings" },
   { key = "range", command = "range", label = "Range icon" },
@@ -217,15 +220,20 @@ end
 -- Watched spells (spell ready icons)
 ------------------------------------------------------------------------------------------------
 
-function CTK.Watch(name)
+-- 'key' picks the list: "watched" (the spell ready icons, the default) or "bigWatched" (the big READY alert).
+local LIST_NAMES = { watched = "the spell ready icons", bigWatched = "the big READY alert" }
+
+function CTK.Watch(name, key)
+  key = key or "watched"
   if not name or name == "" then
-    CTK.Print("type the spell's name, for example /ctk watch Arcane Shot")
+    CTK.Print("type the spell's name, for example " ..
+      (key == "bigWatched" and "/ctk bigadd Kill Command" or "/ctk watch Arcane Shot"))
     return
   end
-  local watched = CTK.char.watched
+  local watched = CTK.char[key]
   for i = 1, table.getn(watched) do
     if string.lower(watched[i]) == string.lower(name) then
-      CTK.Print(watched[i] .. " is already watched.")
+      CTK.Print(watched[i] .. " is already in " .. LIST_NAMES[key] .. ".")
       return
     end
   end
@@ -235,21 +243,22 @@ function CTK.Watch(name)
     return
   end
   table.insert(watched, proper)
-  CTK.Print("watching " .. proper .. ".")
+  CTK.Print("added " .. proper .. " to " .. LIST_NAMES[key] .. ".")
   CTK.UpdateAll()
 end
 
-function CTK.Unwatch(name)
-  local watched = CTK.char.watched
+function CTK.Unwatch(name, key)
+  key = key or "watched"
+  local watched = CTK.char[key]
   for i = 1, table.getn(watched) do
     if string.lower(watched[i]) == string.lower(name or "") then
-      CTK.Print("stopped watching " .. watched[i] .. ".")
+      CTK.Print("took " .. watched[i] .. " off " .. LIST_NAMES[key] .. ".")
       table.remove(watched, i)
       CTK.UpdateAll()
       return
     end
   end
-  CTK.Print("'" .. tostring(name) .. "' isn't being watched.")
+  CTK.Print("'" .. tostring(name) .. "' isn't in " .. LIST_NAMES[key] .. ".")
 end
 
 ------------------------------------------------------------------------------------------------
@@ -270,6 +279,8 @@ local function ChatHelp()
   CTK.Print("/ctk range <spell> - spell the range icon watches")
   CTK.Print("/ctk watch <spell> - add a spell ready icon")
   CTK.Print("/ctk unwatch <spell> - remove one")
+  CTK.Print("/ctk bigadd <spell> - add a spell to the big READY alert")
+  CTK.Print("/ctk bigremove <spell> - take one off")
   CTK.Print("/ctk ready all | one - every watched spell, or just the next one")
   CTK.Print("/ctk dot - list the DoT lengths")
   CTK.Print("/ctk dot <spell> <seconds> | off | auto - fix one")
@@ -354,6 +365,12 @@ local function SlashHandler(msg)
   elseif cmd == "unwatch" then
     CTK.Unwatch(rest)
     return
+  elseif cmd == "bigadd" then
+    CTK.Watch(rest, "bigWatched")
+    return
+  elseif cmd == "bigremove" then
+    CTK.Unwatch(rest, "bigWatched")
+    return
   elseif cmd == "feed" and (rest == "content" or rest == "unhappy") then
     CTK.char.feedWhen = rest
     CTK.char.feed = true
@@ -412,6 +429,7 @@ loader:SetScript("OnEvent", function()
     CTK.db = ClassToolkitDB
     CTK.char = ClassToolkitCharDB
     if type(CTK.char.watched) ~= "table" then CTK.char.watched = nil end
+    if type(CTK.char.bigWatched) ~= "table" then CTK.char.bigWatched = nil end
     CTK.ApplyDefaults()
 
     SLASH_CLASSTOOLKIT1 = "/ctk"

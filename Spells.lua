@@ -13,7 +13,6 @@ local spells = {}          -- [lowercase name] = { name, index, texture }
 local costs = {}           -- [lowercase name] = number, read from the tooltip on first use
 local ranges = {}          -- [lowercase name] = yards (0 for melee), read from the tooltip on first use
 local dotTimes = {}        -- [lowercase name] = seconds a DoT ticks (false: not a DoT), from the tooltip
-local needsCrit = {}       -- [lowercase name] = true when the tooltip says it needs a critical strike first
 local actionSlots = {}     -- [lowercase name] = slot
 local slotNames = {}       -- [slot] = what the button's tooltip calls it
 local slotsDirty = true
@@ -24,7 +23,6 @@ local function ScanSpellbook()
   costs = {}
   ranges = {}
   dotTimes = {}
-  needsCrit = {}
   local i, noIcon = 1, 0
   while i < 500 do
     local name = GetSpellName(i, BOOK)
@@ -145,29 +143,84 @@ function CTK.SpellCost(name)
   return costs[key] or nil
 end
 
--- Does the spell only work after you land a critical strike (Turtle WoW's Kill Command: "Can only be used
--- after the Hunter lands a critical strike on the target")? The game itself doesn't know, so it is read
--- from the tooltip once.
-function CTK.SpellNeedsCrit(name)
-  local key = name and string.lower(name)
-  if not key or not spells[key] then return false end
-  if needsCrit[key] == nil then
-    needsCrit[key] = false
-    local tip = CTK.ScanTooltip()
-    tip:SetSpell(spells[key].index, BOOK)
-    for line = 2, 10 do
-      local text = CTK.ScanLine("Left", line)
-      if text then
-        local lower = string.lower(text)
-        if string.find(lower, "only be used after", 1, true) and string.find(lower, "critical strike", 1, true) then
-          needsCrit[key] = true
-          break
-        end
-      end
-    end
-    tip:Hide()
+-- Copy the spell's own button on your action bar. The game darkens it while the spell can't be used
+-- (Turtle WoW's Kill Command until you crit) and turns it blue without the mana, so the colour of the icon
+-- on screen is the best answer there is. Returns "ok", "dark", "mana", or nil when no button shows it.
+local BAR_BUTTONS = {
+  { "ActionButton", 12 }, { "BonusActionButton", 12 }, { "MultiBarBottomLeftButton", 12 },
+  { "MultiBarBottomRightButton", 12 }, { "MultiBarRightButton", 12 }, { "MultiBarLeftButton", 12 },
+  { "pfActionBarMainButton", 12 }, { "pfActionBarTopButton", 12 }, { "pfActionBarLeftButton", 12 },
+  { "pfActionBarRightButton", 12 }, { "pfActionBarVerticalButton", 12 }, { "pfActionBarPagingButton", 12 },
+  { "BActionButton", 120 }, { "DAB_ActionButton_", 120 },
+}
+local buttonIcon = {}     -- [lowercase name] = the icon of the button showing it
+local buttonLook = {}     -- [lowercase name] = when the bars were last searched for it
+
+local function IconShows(icon, texture)
+  if type(icon) ~= "table" or not icon.GetTexture or not icon.IsVisible or not icon:IsVisible() then
+    return false
   end
-  return needsCrit[key]
+  local t = icon:GetTexture()
+  return t ~= nil and string.lower(t) == texture
+end
+
+local function FindButtonIcon(texture)
+  for i = 1, table.getn(BAR_BUTTONS) do
+    local prefix, count = BAR_BUTTONS[i][1], BAR_BUTTONS[i][2]
+    for n = 1, count do
+      local icon = getglobal(prefix .. n .. "Icon")
+      if IconShows(icon, texture) then return icon end
+    end
+  end
+  -- Another bar addon: look through the frames for a button showing it (not this addon's own icons).
+  if EnumerateFrames then
+    local f = EnumerateFrames()
+    while f do
+      local fname = f.GetName and f:GetName()
+      if fname and not string.find(fname, "^ClassToolkit") then
+        local icon = getglobal(fname .. "Icon")
+        if icon ~= f and IconShows(icon, texture) then return icon end
+      end
+      f = EnumerateFrames(f)
+    end
+  end
+  return nil
+end
+
+function CTK.ButtonState(name)
+  local key = name and string.lower(name)
+  if not key or not spells[key] or not spells[key].texture then return nil end
+  local texture = string.lower(spells[key].texture)
+  local icon = buttonIcon[key]
+  if not IconShows(icon, texture) then
+    buttonIcon[key] = nil
+    local now = GetTime()
+    if not CTK.ActionSlotFor(name) or now - (buttonLook[key] or 0) < 3 then return nil end
+    buttonLook[key] = now
+    icon = FindButtonIcon(texture)
+    if not icon then return nil end
+    buttonIcon[key] = icon
+    CTK.Debug(spells[key].name .. ": copying the button " .. tostring(icon.GetName and icon:GetName()))
+  end
+  if not icon.GetVertexColor then
+    -- No way to read the colour: ask the game about the button's own slot, as the button itself does.
+    local button = icon.GetParent and icon:GetParent()
+    local slot = button and button.action
+    if not slot and button and ActionButton_GetPagedID then
+      local ok, id = pcall(ActionButton_GetPagedID, button)
+      if ok then slot = id end
+    end
+    if not slot then return nil end
+    local usable, lowMana = IsUsableAction(slot)
+    if lowMana then return "mana" end
+    return usable and "ok" or "dark"
+  end
+  local r, g, b = icon:GetVertexColor()
+  if not r then return nil end
+  if b > r + 0.25 and b > g + 0.25 then return "mana" end   -- blue: not enough mana
+  if r > g + 0.3 and r > b + 0.3 then return nil end       -- red (some bars): out of range, said elsewhere
+  if r < 0.7 and g < 0.7 and b < 0.7 then return "dark" end
+  return "ok"
 end
 
 -- How far the spell reaches: yards as the tooltip says ("30 yd range", talents included), 0 for
@@ -226,9 +279,11 @@ end
 function CTK.SpellReadiness(name)
   local left, duration = CTK.SpellCooldown(name)
   if left > 0 and duration > 1.6 then return "cooldown", left end
+  local look = CTK.ButtonState(name)
+  if look == "dark" or look == "mana" then return "unusable", 0 end
   local slot = CTK.ActionSlotFor(name)
   if slot then
-    if not IsUsableAction(slot) then return "unusable", 0 end
+    if look ~= "ok" and not IsUsableAction(slot) then return "unusable", 0 end
     if CTK.HasAttackableTarget() and IsActionInRange(slot) == 0 then return "range", 0 end
   end
   return "ready", 0

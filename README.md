@@ -79,6 +79,8 @@ These started in [PokeHuntLog](https://github.com/notforever-ship-it/PokeHuntLog
 - **Cooldown countdown**: a spell's icon counts 5 to 1 mid-screen before its cooldown ends (on by default; unlock icons to move it).
 - Paladins: your seal counts down the same way as it runs out, so you know when to recast it.
 - Hunters start with Arcane Shot.
+- **Big READY alert**: one big icon that says **READY** when you can hit the spell (Kill Command: after you crit), and goes away once you use it. No countdown, no sound. Unlock icons to move it.
+- Hunters start with Kill Command in it. Add or remove spells: `/ctk bigadd <spell>`, `/ctk bigremove <spell>`.
 
 ## DoT timers
 
@@ -228,6 +230,11 @@ Made by stealthzi.
 MIT, see [LICENSE](LICENSE).
 
 ## Changelog
+
+### 1.7.5
+
+- New: **Big READY alert**, a big icon you can move that says **READY** when you can hit Kill Command (after you crit) and goes away once you use it. Unlock icons to move it. Other spells: `/ctk bigadd <spell>`.
+- Fix: Kill Command still didn't say **READY** at the right time. The spell ready icon now copies your own button on the action bar: grey **not yet** while the button is dark, **READY** the moment it lights up after you crit.
 
 ### 1.7.4
 

@@ -7,22 +7,16 @@
 --
 -- Range can only be read from an action slot in 1.12, so a spell has to be on a bar (any bar, even a
 -- hidden page) for the out-of-range colour. Everything else works from the spellbook alone.
+--
+-- Big READY alert: spells you pick in their own list get one big icon you can move that says READY while
+-- you can hit them (off cooldown, enough mana, in range, your button lit up), and goes away when you use
+-- them. No countdown, no sound.
 
 local CTK = ClassToolkit
 
 local SIZE, PER_LINE, GAP = 32, 6, 36
 local QUESTION = "Interface\\Icons\\INV_Misc_QuestionMark"
 local row
-
--- Spells that only work after you crit your target (Turtle WoW's Kill Command). The game says they are
--- usable any time, so the addon keeps track itself: a crit by you on your target opens it, using the
--- spell (its cooldown starting) or changing target closes it again.
-local critAt = 0        -- when you last crit your current target
-local usedAt = {}       -- [spell] = when its cooldown last started
-
-local function CritReady(name)
-  return critAt > (usedAt[name] or 0)
-end
 
 -- Show one icon as that spell stands right now.
 local function Paint(icon, name, power)
@@ -40,8 +34,15 @@ local function Paint(icon, name, power)
       usable = false
     end
   end
-  if usable ~= false and CTK.SpellNeedsCrit and CTK.SpellNeedsCrit(name) and not CritReady(name) then
+  -- Your own button on the bar has the last word: it stays dark until the spell can really be used
+  -- (Kill Command lights up after you crit), so READY comes when the button lights up.
+  local look = CTK.ButtonState(name)
+  if look == "dark" then
     usable = false
+  elseif look == "mana" then
+    usable, noMana = nil, true
+  elseif look == "ok" then
+    usable, noMana = nil, nil
   end
   -- No target means range can't be judged, not that it's out of range.
   local inRange = nil
@@ -189,6 +190,79 @@ local function OnUpdate()
   CTK.ShowIcons(row, used)
 end
 
+------------------------------------------------------------------------------------------------
+-- Big READY alert
+------------------------------------------------------------------------------------------------
+
+local BIG = 64
+local big            -- the big icon
+local bigShowing     -- the spell it shows right now, or nil
+
+-- The first spell in the big list you can hit right now, or nil.
+local function BigReadyName(list)
+  for i = 1, table.getn(list) do
+    local name = list[i]
+    if CTK.KnowsSpell(name) then
+      local state = CTK.SpellReadiness(name)
+      local cost = CTK.SpellCost(name)
+      if state == "ready" and not (cost and (UnitMana("player") or 0) < cost) then return name end
+    end
+  end
+  return nil
+end
+
+local function HideBig()
+  bigShowing = nil
+  big:Hide()
+end
+
+local bigElapsed = 0
+local function BigOnUpdate()
+  if not CTK.char or CTK.movingIcons then return end
+  bigElapsed = bigElapsed + arg1
+  if bigElapsed < 0.1 then return end
+  bigElapsed = 0
+
+  local c = CTK.char
+  if not c.bigReady or UnitIsDeadOrGhost("player") or
+    not (UnitAffectingCombat("player") or CTK.HasAttackableTarget()) then
+    if bigShowing then HideBig() end
+    return
+  end
+
+  local name = BigReadyName(c.bigWatched or {})
+  if not name then
+    if bigShowing then HideBig() end
+    return
+  end
+  if name ~= bigShowing then
+    bigShowing = name
+    big.icon:SetTexture(CTK.SpellTexture(name) or QUESTION)
+    big.icon:SetVertexColor(1, 1, 1)
+    big.count:SetText("READY")
+    CTK.SetIconState(big, 0.3, 1, 0.3, name)
+    big:Show()
+  end
+end
+
+-- While the icons are unlocked it stays on screen with a sample icon, so it can be dragged.
+local function BigUpdate()
+  if not big then return end
+  local c = CTK.char
+  if CTK.movingIcons and c.bigReady then
+    bigShowing = nil
+    big.icon:SetTexture(CTK.SpellTexture((c.bigWatched or {})[1] or "") or QUESTION)
+    big.icon:SetVertexColor(1, 1, 1)
+    big.count:SetText("READY")
+    CTK.SetIconState(big, 0.3, 1, 0.3, "Big READY alert (drag)")
+    big:EnableMouse(true)
+    big:Show()
+  else
+    big:EnableMouse(false)
+    if CTK.movingIcons or not c.bigReady then HideBig() end
+  end
+end
+
 function CTK.InitReady()
   -- Just right of where the hunter range icon starts out.
   row = CTK.CreateRow("ClassToolkitReady", "ready", 150, -140, SIZE, PER_LINE, GAP)
@@ -196,34 +270,16 @@ function CTK.InitReady()
   driver:SetScript("OnUpdate", OnUpdate)
   CTK.RegisterModule({ update = Update })
 
-  -- Crits for the spells that need one ("You crit Boar for 120." / "Your Arcane Shot crits Boar for 300.").
-  local crits = CreateFrame("Frame")
-  crits:RegisterEvent("CHAT_MSG_COMBAT_SELF_HITS")
-  crits:RegisterEvent("CHAT_MSG_SPELL_SELF_DAMAGE")
-  crits:RegisterEvent("PLAYER_TARGET_CHANGED")
-  crits:RegisterEvent("SPELL_UPDATE_COOLDOWN")
-  crits:SetScript("OnEvent", function()
-    if event == "PLAYER_TARGET_CHANGED" then
-      critAt = 0
-    elseif event == "SPELL_UPDATE_COOLDOWN" then
-      -- A watched crit spell just used: it needs a new crit before it works again.
-      local watched = CTK.char and CTK.char.watched or {}
-      for i = 1, table.getn(watched) do
-        local name = watched[i]
-        if CTK.SpellNeedsCrit and CTK.SpellNeedsCrit(name) then
-          local index = CTK.SpellIndex(name)
-          local start, duration = GetSpellCooldown(index, "spell")
-          if start and start > 0 and duration and duration > 1.6 then usedAt[name] = start end
-        end
-      end
-    else
-      local msg = arg1 or ""
-      local target = UnitName("target")
-      if target and (string.find(msg, "^You crit ") or string.find(msg, " crits ", 1, true))
-        and string.find(msg, target, 1, true) then
-        critAt = GetTime()
-        CTK.Debug("crit on " .. target .. ": crit spells open")
-      end
-    end
-  end)
+  -- The big READY icon: a bit above the middle of the screen, under the cooldown countdown.
+  big = CTK.CreateIcon("ClassToolkitBigReady", UIParent, BIG)
+  big:SetFrameStrata("HIGH")
+  big:EnableMouse(false)
+  big.count:SetFont(STANDARD_TEXT_FONT, 16, "OUTLINE")
+  big.count:SetTextColor(0.3, 1, 0.3)
+  big.label:SetFontObject(GameFontNormal)
+  CTK.MakeDraggable(big, "bigReady", 0, 40)
+  big:Hide()
+  local bigDriver = CreateFrame("Frame")
+  bigDriver:SetScript("OnUpdate", BigOnUpdate)
+  CTK.RegisterModule({ update = BigUpdate })
 end

@@ -40,6 +40,8 @@ local TIPS = {
   readyOne = { "One icon instead of a row.", "Shows the spell ready now, or back soonest." },
   pulse = { "A spell's icon counts 5 to 1 mid-screen before its cooldown ends.", "Spells with a cooldown over 7 seconds. Unlock icons to move it.",
     "Paladins: your seal counts down the same way as it runs out." },
+  bigReady = { "A big READY icon when a spell can be hit (Kill Command after you crit).", "Goes away once you use it.",
+    "Unlock icons to move it.", "Spells: /ctk bigadd <spell>, /ctk bigremove <spell>." },
   buffs = { "An icon when a class buff is missing or running out.", "Click: cast it.",
     "Right-click: stop that reminder." },
   reagents = { "A warning when a reagent runs low.", "Hunters: ammo at 200 and 50 shots." },

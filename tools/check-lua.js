@@ -41,7 +41,7 @@ const KNOWN_GLOBALS = new Set((
   "GetContainerItemInfo GetContainerItemLink GetContainerNumSlots GetPlayerBuff GetPlayerBuffTimeLeft " +
   "GetInventoryItemLink GetInventoryItemTexture UnitIsDeadOrGhost UnitOnTaxi GetPetExperience IsTradeskillTrainer UnitRangedDamage GetSpellCooldown GetSpellTexture UnitMana " +
   "UnitDebuff BOOKTYPE_SPELL SUPERWOW_VERSION " +
-  "IsUsableAction UnitHealth UnitPowerType UseContainerItem GetNumTalentTabs GetNumTalents GetTalentInfo"
+  "IsUsableAction ActionButton_GetPagedID EnumerateFrames UnitHealth UnitPowerType UseContainerItem GetNumTalentTabs GetNumTalents GetTalentInfo"
 ).split(/\s+/).filter(Boolean));
 
 // Member calls that don't exist in Lua 5.0 / the 1.12 client.
