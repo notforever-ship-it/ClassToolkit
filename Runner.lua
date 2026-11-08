@@ -1,6 +1,6 @@
 -- Class Toolkit: runner alert. When your target, or any mob while you are in a fight, "attempts to run away
--- in fear!", a big red RUNNER! shows for 3 seconds with the mob's name, the best spell you have to stop it,
--- and a sound. Read from the mob's emote, English clients only.
+-- in fear!", a big red RUNNER! shows for 3 seconds with the mob's name, the best spell you have to stop it.
+-- Read from the mob's emote, English clients only.
 
 local CTK = ClassToolkit
 
@@ -66,7 +66,6 @@ local function Alert(who)
   frame.name:SetText(who)
   ShowStopper()
   frame:Show()
-  pcall(PlaySound, "RaidWarning")
   CTK.Debug("runner: " .. who)
 end
 

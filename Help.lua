@@ -50,7 +50,7 @@ local HELP_LEFT = table.concat({
   "- " .. B("/ctk dot Rend 12") .. " fixes one. Use " .. B("off") .. " or " .. B("auto") .. " in place of the number.",
   " ",
   GOLD .. "Fight alerts" .. END,
-  "- " .. RED .. "CASTING" .. END .. ": your target starts a cast. Counts it down, with a flash and a sound.",
+  "- " .. RED .. "CASTING" .. END .. ": your target starts a cast. Counts it down, with a flash.",
   "- Next to it: your interrupt or stun. " .. GREEN .. "READY" .. END .. ", a number, " .. RED .. "too far" .. END ..
     " or " .. BLUE .. "can't now" .. END .. ".",
   "- " .. RED .. "RUNNER!" .. END .. ": a mob runs away in fear. Shows the spell to stop it.",

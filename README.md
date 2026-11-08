@@ -110,7 +110,7 @@ These started in [PokeHuntLog](https://github.com/notforever-ship-it/PokeHuntLog
 
 ## Interrupt alert
 
-- Your target starts a cast: a big icon says **CASTING: <spell>**, with a flash and a sound.
+- Your target starts a cast: a big icon says **CASTING: <spell>**, with a flash.
 - It counts the cast down. A **~** in front means the time is a guess (3 seconds) until it has seen that spell.
 - Next to it: your interrupt or stun. **READY**, a number (cooldown), **too far** or **can't now**.
 - Goes away when the cast ends, is interrupted, or you change target.
@@ -118,7 +118,7 @@ These started in [PokeHuntLog](https://github.com/notforever-ship-it/PokeHuntLog
 
 ## Runner alert
 
-- A mob you fight runs away in fear: a big red **RUNNER!** for 3 seconds, with a sound.
+- A mob you fight runs away in fear: a big red **RUNNER!** for 3 seconds.
 - Shows the mob's name and your best spell to stop it (hunters: Concussive Shot, then Wing Clip).
 
 ## Tick bar
@@ -231,6 +231,10 @@ MIT, see [LICENSE](LICENSE).
 
 ## Changelog
 
+### 1.7.6
+
+- Change: the CASTING and RUNNER! alerts no longer play a sound. The icons and flash still show.
+
 ### 1.7.5
 
 - New: **Big READY alert**, a big icon you can move that says **READY** when you can hit Kill Command (after you crit) and goes away once you use it. Unlock icons to move it. Other spells: `/ctk bigadd <spell>`.
@@ -263,7 +267,7 @@ MIT, see [LICENSE](LICENSE).
 
 ### 1.6.0
 
-- **Interrupt alert**: a big CASTING icon when your target starts a cast, with a countdown, a flash, a sound, and your interrupt or stun.
+- **Interrupt alert**: a big CASTING icon when your target starts a cast, with a countdown, a flash, and your interrupt or stun.
 - **Runner alert**: a big red RUNNER! when a mob runs away in fear, with the spell to stop it.
 - **Tick bar**: counts down to your next mana or energy tick; purple for the 5 second rule.
 - **Eat / drink reminder**: after a fight, click to use your best food or drink.

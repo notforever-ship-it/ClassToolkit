@@ -1,5 +1,5 @@
 -- Class Toolkit: interrupt alert. When your enemy target starts casting, a big icon says "CASTING: <spell>",
--- counts the cast down, flashes once and plays a sound. Next to it sits your interrupt or stun, and whether
+-- counts the cast down and flashes once. Next to it sits your interrupt or stun, and whether
 -- it is ready. It goes away when the cast ends, is interrupted, or you change target.
 --
 -- The cast start comes from the combat log ("Kobold Geomancer begins to cast Fireball."), English clients
@@ -116,7 +116,6 @@ local function Start(who, spell, seconds, texture)
   flashAt = now
   frame.flash:SetAlpha(1)
   frame.flash:Show()
-  pcall(PlaySound, "RaidWarning")
   ShowAnswer()
   frame:Show()
   CTK.Debug("cast alert: " .. who .. " casts " .. spell .. ", " .. string.format("%.1f", cast.ends - now) ..

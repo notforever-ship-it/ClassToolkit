@@ -54,7 +54,7 @@ local TIPS = {
   eatWarn = { "Shows while your pet eats.", "Don't attack: it cancels the meal.", "Goes away when the meal is done." },
   ammoBox = { "A red box when your equipped ammo is low.", "100 shots to start. /ctk ammo 50 changes it.",
     "Also shows when a bow or gun has no ammo equipped." },
-  interrupt = { "Your target starts a cast: a big CASTING icon, a flash and a sound.",
+  interrupt = { "Your target starts a cast: a big CASTING icon and a flash.",
     "Counts down the cast. Shows your interrupt or stun and if it is ready.", "Goes away when the cast ends." },
   runner = { "A mob you fight runs away in fear: a big red RUNNER!", "Shows the spell to stop it with." },
   tick = { "A thin bar counting down to your next mana or energy tick (every 2 seconds).",
